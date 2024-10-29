@@ -121,6 +121,44 @@ app.post('/api/member/login', (req, res) => {
   });
 });
 
+app.post('https://api.slipok.com/api/line/apikey/30828',(req,res) => {
+
+  try {
+    const branchId = "30828";
+    const apiKey = "<YOUR_API_KEY>";
+    const path = req;
+    const buffer = fs.readFileSync(path);
+
+    const res = axios.post(
+      `https://api.slipok.com/api/line/apikey/${branchId}`,
+      {
+        files: buffer,
+        log: true,
+        // amount: number, // Add this to check with amount of the slip
+      },
+      {
+        headers: {
+          "x-authorization": apiKey,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    // Handle success slip
+    const slipData = res.data.data;
+    console.log(slipData);
+  } catch (err) {
+    // Handle invalid slip
+    if (axios.isAxiosError(err)) {
+      const errorData = err.response.data;
+      console.log(errorData.code); // Check error code
+      console.log(errorData.message); // Check error message
+      return;
+    }
+    console.log(err);
+  }
+
+});
+
 
 app.listen(3001, () => {
   console.log('Server running on port 3001');

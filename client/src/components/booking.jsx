@@ -10,7 +10,11 @@ const Booking = () => {
     const [endTime, setEndTime] = useState('');
     const [timeDiff, setTimeDiff] = useState(null);
     const [bookedTimes, setBookedTimes] = useState([]);
-    const { user } = useUser();    
+    const { user } = useUser(); 
+    
+    if (!user) {
+        return <div>Loading...</div>; // แสดงผลเมื่อ user ยังไม่ถูกโหลด
+      }
    
     useEffect(() => {
         const fetchBookings = async () => {
