@@ -6,6 +6,7 @@ const Home = () => {
     <div className='container'>
       <center>
         <h1>ยินดีต้อนรับสู่ระบบจองสนามกีฬา!</h1>
+        <a href="/booking">จองสนาม</a>
         <p>กรุณาเลือกการดำเนินการจากเมนูด้านบน</p>
       </center>
     </div>

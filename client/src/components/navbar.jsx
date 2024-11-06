@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
+import Dropdown from 'react-bootstrap/Dropdown';
 import './Navbar.css';
 import { useUser } from './userContext';
 
+
 function Navbar1() {
-  const { user } = useUser(); 
+  const { user, logout} = useUser();
 
   return (
     <Navbar className="bg-body-tertiary">
@@ -16,9 +18,16 @@ function Navbar1() {
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           {user ? (
-            <Navbar.Text>
-              Signed in as: <a href="#profile">{user.name}</a>
-            </Navbar.Text>
+            <Dropdown>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Signed in as: {user.name}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item href="profile">แก้ไขโปรไฟล์</Dropdown.Item>
+                <Dropdown.Item onClick={logout} >ออกจากระบบ</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           ) : (
             <div>
               <Button as={Link} to="/login" variant="outline-success" className="me-2">

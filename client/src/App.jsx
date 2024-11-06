@@ -5,9 +5,9 @@ import Register from './components/Register';
 import Login from './components/login';
 import Booking from './components/booking';
 import Navbar1 from './components/navbar';
-import Footer from './components/footer';
 import PrivateRoute from './components/PrivateRoute';
 import Home from './components/Home';
+import Payment from './components/Payment';
 
 const App = () => {
 
@@ -32,8 +32,8 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route path="/payment" element={<Payment />} />
         </Routes>
-        <Footer />
       </Router>
 
     </UserProvider>

@@ -2,26 +2,28 @@ import React, { useState, useEffect } from 'react';
 import './Booking.css';
 import Swal from 'sweetalert2';
 import { useUser } from './userContext';
+import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
+import Payment from './payment'
 
 const Booking = () => {
+    const { user } = useUser();
     const [field, setField] = useState('');  // สำหรับการเลือกสนาม
     const [date, setDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [timeDiff, setTimeDiff] = useState(null);
     const [bookedTimes, setBookedTimes] = useState([]);
-    const { user } = useUser(); 
-    
-    if (!user) {
-        return <div>Loading...</div>; // แสดงผลเมื่อ user ยังไม่ถูกโหลด
-      }
-   
+    const navigate = useNavigate(); 
+
+
     useEffect(() => {
         const fetchBookings = async () => {
             try {
                 const response = await fetch('http://localhost:3001/api/bookings');
                 const data = await response.json();
                 setBookedTimes(data);  // เก็บข้อมูลการจองใน state
+                console.log(data);
             } catch (error) {
                 console.error('Error fetching bookings:', error);
             }
@@ -30,6 +32,9 @@ const Booking = () => {
         fetchBookings();
     }, []);
 
+    if (!user) {
+        return  <Loading />;
+    }
 
     const getFilteredBookings = () => {
         return bookedTimes.filter(
@@ -61,6 +66,7 @@ const Booking = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const difference = calculateTimeDifference(startTime, endTime);
         setTimeDiff(difference);
 
@@ -87,14 +93,21 @@ const Booking = () => {
                 Swal.fire({
                     icon: 'success',
                     title: 'จองสำเร็จ!',
-                    text: 'รายละเอียด: ',
-                  });
+                    text: `ข้อมูลการจองของคุณ:
+                        \n สนาม: ${bookingData.field}
+                        \n วันที่: ${bookingData.date}
+                        \n เวลาเริ่ม: ${bookingData.startTime}
+                        \n เวลาสิ้นสุด: ${bookingData.endTime}
+                        \n เวลาที่ใช้: ${bookingData.timeUsed} ชั่วโมง
+                        \n จองโดย: ${bookingData.name}`,
+                });
+                navigate('/payment', { state: { state: bookingData } });
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'ไม่สามารถจองได้',
                     text: 'เวลานี้ถูกจองแล้ว',
-                  });
+                });
             }
         } catch (error) {
             console.error('Error:', error);
@@ -102,10 +115,9 @@ const Booking = () => {
                 icon: 'error',
                 title: 'เกิดข้อผิดพลาด',
                 text: 'ไม่สามารถเชื่อมต่อกับเซิฟเวอร์ได้ ลองอีกครั้งภายหลัง',
-              });
+            });
         }
     };
-
 
     return (
         <form onSubmit={handleSubmit} className="booking-form">
@@ -172,8 +184,8 @@ const Booking = () => {
             </div>
 
             <div className='form-group'>
-                    <label htmlFor="name">จองโดย</label>
-                    <input type="text" value={user.name} disabled/>
+                <label htmlFor="name">จองโดย</label>
+                <input type="text" id="name" value={user.name} disabled />
             </div>
 
             <button type="submit" className="submit-btn">ยืนยันการจอง</button>

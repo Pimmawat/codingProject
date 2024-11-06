@@ -15,11 +15,16 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(user));
     } else {
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
   }, [user]);
 
+  const logout = () => {
+    setUser(null);
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, logout }}>
       {children}
     </UserContext.Provider>
   );

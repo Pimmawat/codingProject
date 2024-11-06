@@ -77,7 +77,7 @@ const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เ�
             type="text"
             id="phone"
             name="phone"
-            value={phone} // ใช้ phone แทน form.phone
+            value={phone} 
             onChange={handleChange}
             required
           />
