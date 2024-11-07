@@ -4,6 +4,7 @@ const db = require('./database');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const paymentRoute = require('./payment');
 
 const app = express();
 app.use(cors());
@@ -159,6 +160,7 @@ app.post('https://api.slipok.com/api/line/apikey/30828',(req,res) => {
 
 });
 
+app.use('/api/payment', paymentRoute);
 
 app.listen(3001, () => {
   console.log('Server running on port 3001');

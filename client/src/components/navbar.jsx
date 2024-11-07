@@ -9,12 +9,16 @@ import { useUser } from './userContext';
 
 
 function Navbar1() {
-  const { user, logout} = useUser();
+  const { user, logout } = useUser();
 
   return (
     <Navbar className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand as={Link} to="/">Bookings</Navbar.Brand>
+        {/* เพิ่มโลโก้ที่นี่ */}
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+          <img src="/logo.svg" alt="Logo" className="logo me-2" />
+          Bookings
+        </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           {user ? (
@@ -25,7 +29,7 @@ function Navbar1() {
 
               <Dropdown.Menu>
                 <Dropdown.Item href="profile">แก้ไขโปรไฟล์</Dropdown.Item>
-                <Dropdown.Item onClick={logout} >ออกจากระบบ</Dropdown.Item>
+                <Dropdown.Item onClick={logout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (

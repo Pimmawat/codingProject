@@ -93,15 +93,9 @@ const Booking = () => {
                 Swal.fire({
                     icon: 'success',
                     title: 'จองสำเร็จ!',
-                    text: `ข้อมูลการจองของคุณ:
-                        \n สนาม: ${bookingData.field}
-                        \n วันที่: ${bookingData.date}
-                        \n เวลาเริ่ม: ${bookingData.startTime}
-                        \n เวลาสิ้นสุด: ${bookingData.endTime}
-                        \n เวลาที่ใช้: ${bookingData.timeUsed} ชั่วโมง
-                        \n จองโดย: ${bookingData.name}`,
+                    text: `ระบบกำลังพาท่านไปยังหน้าชำระเงิน`,
                 });
-                navigate('/payment', { state: { state: bookingData } });
+                navigate('/payment',{ state: bookingData });
             } else {
                 Swal.fire({
                     icon: 'error',

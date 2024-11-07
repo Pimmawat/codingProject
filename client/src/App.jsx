@@ -7,7 +7,7 @@ import Booking from './components/booking';
 import Navbar1 from './components/navbar';
 import PrivateRoute from './components/PrivateRoute';
 import Home from './components/Home';
-import Payment from './components/Payment';
+import Payment from './components/payment';
 
 const App = () => {
 
