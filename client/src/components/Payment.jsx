@@ -9,10 +9,14 @@ const Payment = () => {
     const [amount, setAmount] = useState(null);
     const [loading, setLoading] = useState(false);
     const [timeLeft, setTimeLeft] = useState(300);
+    const [file, setFile] = useState(null);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear().toString()}`;
+    };
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]); // บันทึกไฟล์ใน state เมื่อผู้ใช้เลือกไฟล์
     };
 
     const handlePayment = async () => {
@@ -62,6 +66,31 @@ const Payment = () => {
         }
     }, [qrCodeUrl]);
 
+    const handleFileUpload = async () => {
+        if (!file) {
+            alert("กรุณาแนบสลิปก่อนทำการส่ง");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file); 
+
+        try {
+            const response = await fetch('http://localhost:3001/api/payment/upload-slip', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                alert('อัปโหลดสลิปสำเร็จ');
+            } else {
+                console.error('เกิดข้อผิดพลาดในการอัปโหลดสลิป');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     return (
         <div className="payment-form">
             <h2>ข้อมูลการจอง</h2>
@@ -103,10 +132,17 @@ const Payment = () => {
                     <h3>ชำระเงิน {amount} บาท</h3>
                     <p>กรุณาชำระภายใน {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')} นาที</p>
                     <img src={qrCodeUrl} alt="QR Code สำหรับชำระเงิน" />
+                    <p><br/>เมื่อชำระเสร็จแล้วให้กดปุ่มแนบสลีปด้านล่าง</p>
                 </div>
             ) : qrCodeUrl && timeLeft === 0 ? (
                 <p>QR Code หมดอายุแล้ว กรุณาสร้างใหม่</p>
             ) : null}
+             <div className="upload-section">
+                <input type="file" onChange={handleFileChange} accept="image/*" />
+                <button onClick={handleFileUpload} className="submit-btn">
+                    แนบสลิปและส่ง
+                </button>
+            </div>
         </div>
 
     );

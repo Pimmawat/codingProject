@@ -4,7 +4,6 @@ import Swal from 'sweetalert2';
 import { useUser } from './userContext';
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading';
-import Payment from './payment'
 
 const Booking = () => {
     const { user } = useUser();
@@ -28,7 +27,6 @@ const Booking = () => {
                 console.error('Error fetching bookings:', error);
             }
         };
-
         fetchBookings();
     }, []);
 
@@ -183,13 +181,6 @@ const Booking = () => {
             </div>
 
             <button type="submit" className="submit-btn">ยืนยันการจอง</button>
-
-            {timeDiff !== null && (
-                <div className="time-difference">
-                    <p>สนามที่: {field}</p>
-                    <p>เวลาที่ใช้: {timeDiff} ชั่วโมง</p>
-                </div>
-            )}
         </form>
     );
 };
