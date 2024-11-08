@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Login.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from './userContext';
 
 const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เป็น prop
-  const { setUser } = useUser(); // เข้าถึง setUser จากบริบท
+  const { user,setUser } = useUser(); // เข้าถึง setUser จากบริบท
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if(user) {
+      navigate('/booking');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

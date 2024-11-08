@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
@@ -10,11 +10,16 @@ import { useUser } from './userContext';
 
 function Navbar1() {
   const { user, logout } = useUser();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <Navbar className="bg-body-tertiary">
       <Container>
-        {/* เพิ่มโลโก้ที่นี่ */}
         <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
           <img src="/logo.svg" alt="Logo" className="logo me-2" />
           Bookings
@@ -23,13 +28,13 @@ function Navbar1() {
         <Navbar.Collapse className="justify-content-end">
           {user ? (
             <Dropdown>
-              <Dropdown.Toggle variant="success" id="dropdown-basic">
+              <Dropdown.Toggle variant="outline-primary" id="dropdown-basic">
                 Signed in as: {user.name}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
                 <Dropdown.Item href="profile">แก้ไขโปรไฟล์</Dropdown.Item>
-                <Dropdown.Item onClick={logout}>ออกจากระบบ</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (

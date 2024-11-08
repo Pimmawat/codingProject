@@ -32,7 +32,13 @@ const App = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment" 
+          element={
+          <PrivateRoute>
+            <Payment/>
+          </PrivateRoute>
+          }
+          />
         </Routes>
       </Router>
 

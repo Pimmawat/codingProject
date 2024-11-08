@@ -4,17 +4,15 @@ const qrcode = require('qrcode');
 
 const router = express.Router();
 
-// สมมติว่าใช้หมายเลข PromptPay เป็นตัวอย่าง
-const promptPayID = '0931713860'; // หมายเลขโทรศัพท์หรือเลข PromptPay ID
+const promptPayID = '0931713860'; 
 
 router.post('/generate-qrcode', async (req, res) => {
-    const { timeUsed } = req.body; // ดึงข้อมูลเวลาที่ใช้จาก request
+    const { timeUsed } = req.body; 
 
     if (!timeUsed || typeof timeUsed !== 'number') {
         return res.status(400).json({ message: 'ข้อมูลเวลาไม่ถูกต้อง' });
     }
 
-    // คำนวณค่าใช้จ่ายโดยเอาเวลาที่ใช้คูณกับราคาต่อชั่วโมง
     const ratePerHour = 1;
     const amount = timeUsed * ratePerHour;
 
@@ -25,7 +23,6 @@ router.post('/generate-qrcode', async (req, res) => {
         // สร้าง QR Code
         const qrCodeDataUrl = await qrcode.toDataURL(payload);
         
-        // ส่ง URL ของ QR Code กลับไปให้ frontend
         res.json({
             amount,
             qrCodeUrl: qrCodeDataUrl

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Payment.css';
+import Loading from './Loading';
 
 const Payment = () => {
     const location = useLocation();
@@ -18,6 +19,10 @@ const Payment = () => {
     const handleFileChange = (event) => {
         setFile(event.target.files[0]); // บันทึกไฟล์ใน state เมื่อผู้ใช้เลือกไฟล์
     };
+
+    if (!state) {
+        return  <Loading />;
+    }
 
     const handlePayment = async () => {
         if (!state || !state.timeUsed) return;
