@@ -13,7 +13,7 @@ const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เ�
 
   useEffect(() => {
     if(user) {
-      navigate('/booking');
+      navigate('/home');
     }
   }, [user, navigate]);
 

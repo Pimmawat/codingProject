@@ -5,6 +5,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const paymentRoute = require('./payment');
+const multer = require('multer');
+const FormData = require('form-data');
+const axios = require("axios");
+const fs = require("fs");
 
 const app = express();
 app.use(cors());
@@ -12,6 +16,8 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 const JWT_SECRET = 'hellohackerman';
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 db.connect((err) => {
   if (err) throw err;
@@ -122,45 +128,48 @@ app.post('/api/member/login', (req, res) => {
   });
 });
 
-app.post('https://api.slipok.com/api/line/apikey/30828',(req,res) => {
+app.use('/api/payment', paymentRoute);
 
+app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => {
   try {
-    const branchId = "30828";
-    const apiKey = "<YOUR_API_KEY>";
-    const path = req;
-    const buffer = fs.readFileSync(path);
+    if (!req.file) {
+      return res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์สลิป' });
+    }
 
-    const res = axios.post(
+    const branchId = "30828";  // ใส่ Branch ID ของคุณ
+    const apiKey = "SLIPOKE0E8CPS";  // ใส่ API Key ของคุณ
+
+    const form = new FormData();
+    form.append('files', req.file.buffer, { filename: req.file.originalname });
+
+    const response = await axios.post(
       `https://api.slipok.com/api/line/apikey/${branchId}`,
-      {
-        files: buffer,
-        log: true,
-        // amount: number, // Add this to check with amount of the slip
-      },
+      form,
       {
         headers: {
-          "x-authorization": apiKey,
-          "Content-Type": "multipart/form-data",
+          ...form.getHeaders(),  
+          "x-authorization": apiKey, 
         },
       }
     );
-    // Handle success slip
-    const slipData = res.data.data;
+
+    const slipData = response.data.data;
     console.log(slipData);
+
+    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData });
   } catch (err) {
-    // Handle invalid slip
+    // การจัดการข้อผิดพลาด
+    console.error(err);
     if (axios.isAxiosError(err)) {
       const errorData = err.response.data;
-      console.log(errorData.code); // Check error code
-      console.log(errorData.message); // Check error message
-      return;
+      console.log(errorData.code);  // แสดงรหัสข้อผิดพลาด
+      console.log(errorData.message);  // แสดงข้อความข้อผิดพลาด
+      return res.status(500).json({ message: errorData.message });
     }
-    console.log(err);
+    return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปโหลดสลิป' });
   }
-
 });
 
-app.use('/api/payment', paymentRoute);
 
 app.listen(3001, () => {
   console.log('Server running on port 3001');
