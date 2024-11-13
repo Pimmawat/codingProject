@@ -4,22 +4,20 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from './userContext';
 
-const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เป็น prop
-  const { user,setUser } = useUser(); // เข้าถึง setUser จากบริบท
+const Login = ({ handleLoginSuccess }) => {
+  const { user, setUser } = useUser(); 
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-
   const navigate = useNavigate();
 
   useEffect(() => {
     if(user) {
-      navigate('/result');
+      navigate('/ticket');
     }
   }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // ใช้ setPhone และ setPassword แทนการใช้ form
     if (name === 'phone') {
       setPhone(value);
     } else if (name === 'password') {
@@ -41,18 +39,17 @@ const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เ�
 
       const data = await response.json();
       if (response.ok) {
-        setUser({ name: data.name }); // อัปเดตบริบทผู้ใช้
+        setUser({ name: data.name });
         localStorage.setItem('token', data.token);
+        localStorage.setItem('phone', phone); // เก็บ phone ใน localStorage
         handleLoginSuccess(data.name);
-        console.log(data.name); // เรียกใช้ฟังก์ชันที่ส่งมาจาก props
-        console.log(data.token);
         Swal.fire({
           title: 'เข้าสู่ระบบสำเร็จ!',
           text: data.message,
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          navigate('/'); 
+          navigate('/ticket'); 
         });
       } else {
         Swal.fire({

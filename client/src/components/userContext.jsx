@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
+  const [user, setUser,phone, setPhone] = useState(() => {
     // ดึง user จาก localStorage เมื่อ component ถูกโหลดครั้งแรก
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
@@ -16,6 +16,7 @@ export const UserProvider = ({ children }) => {
     } else {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+      localStorage.removeItem('phone');
     }
   }, [user]);
 

@@ -26,8 +26,8 @@ db.connect((err) => {
 
 
 app.post('/api/bookings', (req, res) => {
-  const { field, date, startTime, endTime, timeUsed, name } = req.body;
-  console.log(field, date, startTime, endTime, timeUsed, name);
+  const { field, date, startTime, endTime, timeUsed, name, phone } = req.body;
+  console.log(field, date, startTime, endTime, timeUsed, name, phone);
 
   const checkQuery = `
 SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
@@ -38,8 +38,8 @@ SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTim
       return res.status(400).send({ message: 'เวลานี้ถูกจองแล้ว' });
     }
 
-    const query = `INSERT INTO reserve (field, date, startTime, endTime, timeUsed, name) VALUES (?, ?, ?, ?, ?, ?)`;
-    db.query(query, [field, date, startTime, endTime, timeUsed, name], (err, result) => {
+    const query = `INSERT INTO reserve (field, date, startTime, endTime, timeUsed, name, phone) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    db.query(query, [field, date, startTime, endTime, timeUsed, name, phone], (err, result) => {
       if (err) return res.status(500).send(err);
       res.status(201).send({ message: 'จองสำเร็จ', bookingId: result.insertId });
     });
@@ -171,29 +171,23 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
   }
 });
 
-app.get('/api/results', async (req, res) => {
-  const { name } = req.query;
-  const sql = 'SELECT * FROM reserve WHERE name = ?';
+app.get('/api/tickets', (req, res) => {
+  const sql = 'SELECT * FROM reserve WHERE phone = ?';
+  const phone = req.query.phone; // ใช้ req.query เพื่อดึงค่าจาก query string
 
-  try {
-      const [results] = await db.query(sql, [name]);
-
-      if (!Array.isArray(results)) {
-          return res.status(500).json({ error: 'ข้อมูลที่ได้รับไม่ถูกต้อง' });
+  db.query(sql, [phone], (err, results) => {
+    if (err) {
+      console.error('Error fetching bookings:', err);
+      res.status(500).send('Error fetching bookings');
+    } else {
+      if (Array.isArray(results)) {
+        res.json(results);
+      } else {
+        res.json([]);
       }
-
-      if (results.length === 0) {
-          return res.status(404).json({ message: 'ไม่พบข้อมูลการจอง' });
-      }
-
-      return res.json(results);
-  } catch (error) {
-      console.error("Error fetching bookings:", error);
-      res.status(500).json({ error: 'ไม่สามารถดึงข้อมูลการจองได้' });
-  }
+    }
+  });
 });
-
-
 
 
 app.listen(3001, () => {

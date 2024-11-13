@@ -7,50 +7,105 @@ import { useUser } from './userContext';
 const Ticket = () => {
     const { user } = useUser();
     const [bookings, setBookings] = useState(null);
+    const [showQRCode, setShowQRCode] = useState(false);
+    const [selectedBookingId, setSelectedBookingId] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'asc' }); // ตั้งค่าการเรียงเริ่มต้น
 
-    if (!user) {
-        return <Loading/>
+    const phone = user?.phone || localStorage.getItem('phone'); // ดึง phone จาก user หรือจาก localStorage
+
+    if (!phone) {
+        return <Loading />;
     }
 
     useEffect(() => {
-        // ฟังก์ชันดึงข้อมูลการจอง
         const fetchBookings = async () => {
             try {
-                const response = await fetch(`/api/tickets?name=${user.name}`);
-                console.log("Response Status:", response.status); // ดูสถานะการตอบกลับ
-        
-                if (!response.ok) {
-                    throw new Error(`ไม่สามารถดึงข้อมูลการจองได้ - สถานะ: ${response.status}`);
-                }
-        
-                const data = await response.json(); // แปลง response เป็น JSON
-                console.log("Data:", data); // ดูข้อมูลที่ได้รับจาก API
+                const response = await fetch(`http://localhost:3001/api/tickets?phone=${phone}`); // เปลี่ยนจาก user.phone เป็น phone
+                const data = await response.json();
                 setBookings(data);
             } catch (error) {
-                console.log(error.message);
-                setBookings([]); // กำหนดเป็นอาร์เรย์ว่างถ้าเกิดข้อผิดพลาด
+                console.error('Error fetching bookings:', error);
             }
         };
         fetchBookings();
-    }, [user.name]); 
+    }, [phone]); // ดึงค่า phone จาก localStorage ทุกครั้งเมื่อ phone เปลี่ยนแปลง
+
+    // ฟังก์ชันเปิด Modal
+    const openModal = (bookingId) => {
+        setSelectedBookingId(bookingId);
+        setShowQRCode(true);
+    };
+
+    // ฟังก์ชันปิด Modal
+    const closeModal = () => {
+        setSelectedBookingId(null);
+        setShowQRCode(false);
+    };
+
+    // ฟังก์ชันจัดเรียงข้อมูล
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+
+    // จัดเรียงข้อมูลตามการตั้งค่า
+    const sortedBookings = bookings ? [...bookings].sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+            return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+            return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    }) : [];
 
     return (
-        <div>
+        <div className="ticket-container">
             <h2>ข้อมูลการจองของคุณ</h2>
-            {bookings && bookings.length > 0 ? ( // ตรวจสอบว่ามีข้อมูลใน bookings
-                bookings.map((booking, index) => {
-                    const uniqueKey = booking.id || `booking-${index}`; // ใช้ `index` ถ้าไม่มี `id`
-                    return (
-                        <div key={uniqueKey} className="booking">
-                            <p><strong>สนาม:</strong> {booking.field}</p>
-                            <p><strong>วันที่:</strong> {booking.date}</p>
-                            <p><strong>เวลา:</strong> {booking.startTime} - {booking.endTime}</p>
-                            <QRCode value={`Booking ID: ${booking.id}`} size={128} />
-                        </div>
-                    );
-                })
+            {sortedBookings.length > 0 ? (
+                <table className="booking-table">
+                    <thead>
+                        <tr>
+                            <th onClick={() => handleSort('field')}>สนาม {sortConfig.key === 'field' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                            <th onClick={() => handleSort('date')}>วันที่ {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                            <th onClick={() => handleSort('startTime')}>เวลา {sortConfig.key === 'startTime' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                            <th>QR Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedBookings.map((booking, index) => (
+                            <tr key={booking.id || `booking-${index}`}>
+                                <td>{booking.field}</td>
+                                <td>{formatDate(booking.date)}</td>
+                                <td>{booking.startTime} - {booking.endTime}</td>
+                                <td>
+                                    <button onClick={() => openModal(booking.id)} className="qr-button">
+                                        แสดง QR Code
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             ) : (
-                <p>ไม่มีข้อมูลการจอง</p>
+                <p className="no-bookings">ไม่มีข้อมูลการจอง</p>
+            )}
+            {showQRCode && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={closeModal}>&times;</span>
+                        <h3>QR Code การจอง</h3>
+                        <QRCode className="qr-code" value={`Booking ID: ${selectedBookingId}`} size={128} />
+                    </div>
+                </div>
             )}
         </div>
     );

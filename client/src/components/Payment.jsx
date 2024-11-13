@@ -19,11 +19,6 @@ const Payment = () => {
     const navigate = useNavigate();
 
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear().toString()}`;
-    };
-
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         setFile(selectedFile);
@@ -138,12 +133,19 @@ const Payment = () => {
 
     const handlePaymentSuccess = async () => {
         try {
+            const phone = localStorage.getItem('phone'); // ดึง phone จาก localStorage
+    
+            const bookingData = {
+                ...state, // ข้อมูลการจองจาก state
+                phone,    // เพิ่ม phone เข้าไปในข้อมูลการจอง
+            };
+    
             const response = await fetch('http://localhost:3001/api/bookings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(state),  // ส่งข้อมูลการจองจาก `state`
+                body: JSON.stringify(bookingData), // ส่งข้อมูลการจองรวมถึง phone ไปยัง backend
             });
     
             if (response.ok) {
@@ -181,7 +183,7 @@ const Payment = () => {
                     </tr>
                     <tr>
                         <th>วันที่</th>
-                        <td>{formatDate(state.date)}</td>
+                        <td>{state.date}</td>
                     </tr>
                     <tr>
                         <th>เวลาเริ่ม</th>

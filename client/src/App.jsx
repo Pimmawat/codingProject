@@ -13,7 +13,7 @@ import Ticket from './components/Ticket';
 const App = () => {
 
   const [user, setUser] = useState(null); // สถานะผู้ใช้
-  const [phone,setPhone] = useState();
+  const [phone,setPhone] = useState(null);
 
   const handleLoginSuccess = (name) => {
     setUser({ name }); // อัปเดตชื่อผู้ใช้ที่ล็อกอิน
