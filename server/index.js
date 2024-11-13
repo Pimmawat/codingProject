@@ -135,20 +135,22 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
     if (!req.file) {
       return res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์สลิป' });
     }
-
+    const { amount } = req.body;
     const branchId = "30828";  // ใส่ Branch ID ของคุณ
     const apiKey = "SLIPOKE0E8CPS";  // ใส่ API Key ของคุณ
 
     const form = new FormData();
     form.append('files', req.file.buffer, { filename: req.file.originalname });
+    form.append('amount', amount);
+    //form.append('log', 'true');
 
     const response = await axios.post(
       `https://api.slipok.com/api/line/apikey/${branchId}`,
       form,
       {
         headers: {
-          ...form.getHeaders(),  
-          "x-authorization": apiKey, 
+          ...form.getHeaders(),
+          "x-authorization": apiKey,
         },
       }
     );
@@ -158,17 +160,40 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
 
     res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData });
   } catch (err) {
-    // การจัดการข้อผิดพลาด
     console.error(err);
-    if (axios.isAxiosError(err)) {
-      const errorData = err.response.data;
-      console.log(errorData.code);  // แสดงรหัสข้อผิดพลาด
-      console.log(errorData.message);  // แสดงข้อความข้อผิดพลาด
-      return res.status(500).json({ message: errorData.message });
+    if (axios.isAxiosError(err) && err.response) {
+      const statusCode = err.response.status;
+      const errorMessage = err.response.data?.message || 'เกิดข้อผิดพลาด';
+      console.log(`Error ${statusCode}: ${errorMessage}`);
+      return res.status(statusCode).json({ message: errorMessage });
     }
     return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปโหลดสลิป' });
   }
 });
+
+app.get('/api/results', async (req, res) => {
+  const { name } = req.query;
+  const sql = 'SELECT * FROM reserve WHERE name = ?';
+
+  try {
+      const [results] = await db.query(sql, [name]);
+
+      if (!Array.isArray(results)) {
+          return res.status(500).json({ error: 'ข้อมูลที่ได้รับไม่ถูกต้อง' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ message: 'ไม่พบข้อมูลการจอง' });
+      }
+
+      return res.json(results);
+  } catch (error) {
+      console.error("Error fetching bookings:", error);
+      res.status(500).json({ error: 'ไม่สามารถดึงข้อมูลการจองได้' });
+  }
+});
+
+
 
 
 app.listen(3001, () => {

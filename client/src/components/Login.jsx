@@ -13,7 +13,7 @@ const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เ�
 
   useEffect(() => {
     if(user) {
-      navigate('/home');
+      navigate('/result');
     }
   }, [user, navigate]);
 
@@ -52,7 +52,7 @@ const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เ�
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          navigate('/booking'); 
+          navigate('/'); 
         });
       } else {
         Swal.fire({
@@ -94,7 +94,7 @@ const Login = ({ handleLoginSuccess }) => { // รับ handleLoginSuccess เ�
             type="password"
             id="password"
             name="password"
-            value={password} // ใช้ password แทน form.password
+            value={password}
             onChange={handleChange}
             required
           />

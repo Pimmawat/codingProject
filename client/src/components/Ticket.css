@@ -1,0 +1,25 @@
+/* src/components/Result.css */
+
+.result-container {
+    padding: 20px;
+}
+
+.booking-info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.booking-info-table th, .booking-info-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.qr-code-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.file-preview {
+    max-width: 100%;
+    height: auto;
+}

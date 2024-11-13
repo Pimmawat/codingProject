@@ -76,39 +76,14 @@ const Booking = () => {
             timeUsed: difference,
             name: user.name,
         };
+        Swal.fire({
+            icon: 'success',
+            title: 'การจองของคุณพร้อมแล้ว',
+            text: 'ระบบกำลังพาคุณไปยังหน้าชำระเงิน',
+        });
 
-        try {
-            const response = await fetch('http://localhost:3001/api/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(bookingData),
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'จองสำเร็จ!',
-                    text: `ระบบกำลังพาท่านไปยังหน้าชำระเงิน`,
-                });
-                navigate('/payment',{ state: bookingData });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'ไม่สามารถจองได้',
-                    text: 'เวลานี้ถูกจองแล้ว',
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถเชื่อมต่อกับเซิฟเวอร์ได้ ลองอีกครั้งภายหลัง',
-            });
-        }
+        // นำไปยังหน้าชำระเงินพร้อมข้อมูลการจอง
+        navigate('/payment', { state: bookingData });
     };
 
     return (

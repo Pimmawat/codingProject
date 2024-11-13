@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import './Payment.css';
 import Loading from './Loading';
-import axios from "axios";
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import './Payment.css';
+
 
 const Payment = () => {
     const location = useLocation();
@@ -14,6 +16,8 @@ const Payment = () => {
     const [file, setFile] = useState(null);
     const [filePreview, setFilePreview] = useState(null); // เก็บ URL สำหรับแสดงตัวอย่างไฟล์
     const [countdownInterval, setCountdownInterval] = useState(null);
+    const navigate = useNavigate();
+
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -24,7 +28,6 @@ const Payment = () => {
         const selectedFile = e.target.files[0];
         setFile(selectedFile);
 
-        // แสดงตัวอย่างไฟล์
         const previewUrl = URL.createObjectURL(selectedFile);
         setFilePreview(previewUrl);
     };
@@ -89,12 +92,18 @@ const Payment = () => {
 
     const handleFileUpload = async () => {
         if (!file) {
-            alert("กรุณาแนบสลิปก่อนทำการส่ง");
+            Swal.fire({
+                title: 'เกิดข้อผิดพลาด',
+                text: `กรุณาแนบสลีปโอนเงินก่อน`,
+                icon: 'warning',
+                confirmButtonText: 'ลองอีกครั้ง',
+            });
             return;
         }
 
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('amount', amount);
 
         try {
             const response = await fetch('http://localhost:3001/api/payment/upload-slip', {
@@ -102,14 +111,62 @@ const Payment = () => {
                 body: formData,
             });
 
+            const responseData = await response.json();
+
             if (response.ok) {
-                alert('อัปโหลดสลิปสำเร็จ');
+                Swal.fire({
+                    title: 'จองสำเร็จ',
+                    text: `${responseData.message}`,
+                    icon: 'success',
+                    confirmButtonText: 'ตกลง',
+                  }).then(() => {
+                    handlePaymentSuccess();
+                    navigate('/ticket');
+                });
             } else {
-                alert('เกิดข้อผิดพลาดในการอัพโหลดสลีป')
-                console.error('เกิดข้อผิดพลาดในการอัปโหลดสลิป');
+                Swal.fire({
+                    title: 'จองไม่สำเร็จ',
+                    text: `${responseData.message}`,
+                    icon: 'warning',
+                    confirmButtonText: 'ลองอีกครั้ง',
+                });
             }
         } catch (error) {
             console.error('Error:', error);
+        }
+    };
+
+    const handlePaymentSuccess = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(state),  // ส่งข้อมูลการจองจาก `state`
+            });
+    
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ชำระเงินสำเร็จ',
+                    text: 'การจองของคุณได้บันทึกเรียบร้อย',
+                });
+                // อาจนำผู้ใช้ไปยังหน้าอื่นหลังบันทึกสำเร็จ
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ไม่สามารถบันทึกการจองได้',
+                    text: 'โปรดลองใหม่อีกครั้ง',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ ลองอีกครั้งภายหลัง',
+            });
         }
     };
 
