@@ -81,7 +81,7 @@ const Payment = () => {
     useEffect(() => {
         return () => {
             if (countdownInterval) clearInterval(countdownInterval);
-            if (filePreview) URL.revokeObjectURL(filePreview); // ล้าง URL ของไฟล์เมื่อ component นี้ถูกทำลาย
+            if (filePreview) URL.revokeObjectURL(filePreview); 
         };
     }, [countdownInterval, filePreview]);
 
@@ -133,11 +133,11 @@ const Payment = () => {
 
     const handlePaymentSuccess = async () => {
         try {
-            const phone = localStorage.getItem('phone'); // ดึง phone จาก localStorage
+            const phone = localStorage.getItem('phone');
     
             const bookingData = {
                 ...state, // ข้อมูลการจองจาก state
-                phone,    // เพิ่ม phone เข้าไปในข้อมูลการจอง
+                phone,    
             };
     
             const response = await fetch('http://localhost:3001/api/bookings', {
@@ -145,7 +145,7 @@ const Payment = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(bookingData), // ส่งข้อมูลการจองรวมถึง phone ไปยัง backend
+                body: JSON.stringify(bookingData),
             });
     
             if (response.ok) {
@@ -154,7 +154,7 @@ const Payment = () => {
                     title: 'ชำระเงินสำเร็จ',
                     text: 'การจองของคุณได้บันทึกเรียบร้อย',
                 });
-                // อาจนำผู้ใช้ไปยังหน้าอื่นหลังบันทึกสำเร็จ
+                
             } else {
                 Swal.fire({
                     icon: 'error',

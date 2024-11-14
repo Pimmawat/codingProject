@@ -41,7 +41,7 @@ const Login = ({ handleLoginSuccess }) => {
       if (response.ok) {
         setUser({ name: data.name });
         localStorage.setItem('token', data.token);
-        localStorage.setItem('phone', phone); // เก็บ phone ใน localStorage
+        localStorage.setItem('phone', phone);
         handleLoginSuccess(data.name);
         Swal.fire({
           title: 'เข้าสู่ระบบสำเร็จ!',

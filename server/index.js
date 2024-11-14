@@ -136,8 +136,8 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
       return res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์สลิป' });
     }
     const { amount } = req.body;
-    const branchId = "30828";  // ใส่ Branch ID ของคุณ
-    const apiKey = "SLIPOKE0E8CPS";  // ใส่ API Key ของคุณ
+    const branchId = "30828"; 
+    const apiKey = "SLIPOKE0E8CPS";  
 
     const form = new FormData();
     form.append('files', req.file.buffer, { filename: req.file.originalname });
@@ -173,7 +173,7 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
 
 app.get('/api/tickets', (req, res) => {
   const sql = 'SELECT * FROM reserve WHERE phone = ?';
-  const phone = req.query.phone; // ใช้ req.query เพื่อดึงค่าจาก query string
+  const phone = req.query.phone; 
 
   db.query(sql, [phone], (err, results) => {
     if (err) {

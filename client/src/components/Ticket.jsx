@@ -9,9 +9,9 @@ const Ticket = () => {
     const [bookings, setBookings] = useState(null);
     const [showQRCode, setShowQRCode] = useState(false);
     const [selectedBookingId, setSelectedBookingId] = useState(null);
-    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'asc' }); // ตั้งค่าการเรียงเริ่มต้น
+    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'asc' });
 
-    const phone = user?.phone || localStorage.getItem('phone'); // ดึง phone จาก user หรือจาก localStorage
+    const phone = user?.phone || localStorage.getItem('phone'); 
 
     if (!phone) {
         return <Loading />;
@@ -20,7 +20,7 @@ const Ticket = () => {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/tickets?phone=${phone}`); // เปลี่ยนจาก user.phone เป็น phone
+                const response = await fetch(`http://localhost:3001/api/tickets?phone=${phone}`); 
                 const data = await response.json();
                 setBookings(data);
             } catch (error) {
@@ -28,21 +28,18 @@ const Ticket = () => {
             }
         };
         fetchBookings();
-    }, [phone]); // ดึงค่า phone จาก localStorage ทุกครั้งเมื่อ phone เปลี่ยนแปลง
+    }, [phone]); 
 
-    // ฟังก์ชันเปิด Modal
     const openModal = (bookingId) => {
         setSelectedBookingId(bookingId);
         setShowQRCode(true);
     };
 
-    // ฟังก์ชันปิด Modal
     const closeModal = () => {
         setSelectedBookingId(null);
         setShowQRCode(false);
     };
 
-    // ฟังก์ชันจัดเรียงข้อมูล
     const handleSort = (key) => {
         let direction = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -56,7 +53,6 @@ const Ticket = () => {
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
 
-    // จัดเรียงข้อมูลตามการตั้งค่า
     const sortedBookings = bookings ? [...bookings].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
             return sortConfig.direction === 'asc' ? -1 : 1;

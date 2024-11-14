@@ -20,8 +20,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // ตรวจสอบรูปแบบเบอร์โทร
-    const phonePattern = /^[0-9]{10}$/; // ปรับตามรูปแบบเบอร์โทรที่ต้องการ
+    const phonePattern = /^[0-9]{10}$/;
     if (!phonePattern.test(form.phone)) {
       return Swal.fire({
         title: 'ข้อผิดพลาด!',
@@ -43,19 +42,18 @@ const Register = () => {
       const data = await response.json();
   
       if (response.ok) {
-        // แสดง SweetAlert2 สำหรับข้อความสำเร็จ
         Swal.fire({
           title: 'สำเร็จ!',
           text: data.message,
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          navigate('/login'); // นำทางไปยังหน้า Login เมื่อผู้ใช้กดตกลง
+          navigate('/login'); 
         });
   
-        setForm({ name: '', phone: '', password: '' }); // ล้างฟอร์มหลังจากลงทะเบียนสำเร็จ
+        setForm({ name: '', phone: '', password: '' }); 
       } else {
-        // แสดง SweetAlert2 สำหรับข้อผิดพลาด
+        
         Swal.fire({
           title: 'ข้อผิดพลาด!',
           text: data.message,
@@ -65,7 +63,7 @@ const Register = () => {
       }
     } catch (error) {
       console.error(error);
-      // แสดง SweetAlert2 สำหรับข้อผิดพลาดในการเชื่อมต่อ
+     
       Swal.fire({
         title: 'เกิดข้อผิดพลาด!',
         text: 'เกิดข้อผิดพลาดในการลงทะเบียน',
