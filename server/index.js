@@ -8,7 +8,9 @@ const paymentRoute = require('./payment');
 const multer = require('multer');
 const FormData = require('form-data');
 const axios = require("axios");
-const fs = require("fs");
+const dayjs = require("dayjs");
+const isBetween = require('dayjs/plugin/isBetween');
+dayjs.extend(isBetween);
 
 const app = express();
 app.use(cors());
@@ -136,8 +138,8 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
       return res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์สลิป' });
     }
     const { amount } = req.body;
-    const branchId = "30828"; 
-    const apiKey = "SLIPOKE0E8CPS";  
+    const branchId = "30828";
+    const apiKey = "SLIPOKE0E8CPS";
 
     const form = new FormData();
     form.append('files', req.file.buffer, { filename: req.file.originalname });
@@ -173,7 +175,7 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
 
 app.get('/api/tickets', (req, res) => {
   const sql = 'SELECT * FROM reserve WHERE phone = ?';
-  const phone = req.query.phone; 
+  const phone = req.query.phone;
 
   db.query(sql, [phone], (err, results) => {
     if (err) {
@@ -187,6 +189,42 @@ app.get('/api/tickets', (req, res) => {
       }
     }
   });
+});
+
+app.post("/api/verify-qrcode", (req, res) => {
+  const { qrcode } = req.body;
+
+  if (!qrcode) {
+    return res.status(400).json({ success: false, message: "QR Code is required" });
+  }
+
+  try {
+    const decodedData = decodeURIComponent(qrcode);
+    const bookingInfo = JSON.parse(decodedData);
+    console.log(bookingInfo);
+
+    const { field, date, startTime, endTime } = bookingInfo;
+
+    // สร้างวันที่และเวลาจากข้อมูลใน QR Code
+    const qrStartDateTime = dayjs(`${date} ${startTime}`);
+    const qrEndDateTime = dayjs(`${date} ${endTime}`);
+    const currentTime = dayjs();
+
+    // ตรวจสอบว่า date, startTime, และ endTime ตรงกับปัจจุบันหรือไม่
+    if (!qrStartDateTime.isValid() || !qrEndDateTime.isValid()) {
+      return res.status(400).json({ success: false, message: "Invalid QR Code format" });
+    }
+
+    // ตรวจสอบว่าเวลาปัจจุบันอยู่ในช่วงระหว่าง startTime และ endTime หรือไม่
+    if (currentTime.isBetween(qrStartDateTime, qrEndDateTime, null, '[)')) {
+      return res.status(200).json({ success: true, message: "QR code ถูกต้อง", bookingInfo });
+    } else {
+      return res.status(400).json({ success: false, message: "QR Code ไม่ถูกต้อง" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
 });
 
 

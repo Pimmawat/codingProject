@@ -2,11 +2,10 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button';
+import Nav from 'react-bootstrap/Nav';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './Navbar.css';
 import { useUser } from './userContext';
-
 
 function Navbar1() {
   const { user, logout } = useUser();
@@ -18,38 +17,48 @@ function Navbar1() {
   };
 
   return (
-    <Navbar className="bg-body-tertiary">
+    <Navbar bg="white" className="shadow-sm py-3 fixed-top">
       <Container>
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-          <img src="/logo.svg" alt="Logo" className="logo me-2" />
+        <Navbar.Brand as={Link} to="/" className="text-dark fw-bold d-flex align-items-center">
+          <img src="/logo.svg" alt="Logo" className="logo me-2" style={{ width: '40px', height: '40px' }} />
           Bookings
         </Navbar.Brand>
-        <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end">
           {user ? (
-            <Dropdown>
-              <Dropdown.Toggle variant="outline-primary" id="dropdown-basic">
-                Signed in as: {user.name}
+            <Dropdown align="end">
+              <Dropdown.Toggle
+                variant="outline-primary"
+                id="dropdown-basic"
+                className="d-flex align-items-center"
+              >
+                <img
+                  src="/profile-placeholder.png"
+                  alt="Profile"
+                  className="rounded-circle me-2"
+                  style={{ width: '30px', height: '30px' }}
+                />
+                {user.name}
               </Dropdown.Toggle>
-
               <Dropdown.Menu>
-                <Dropdown.Item href="profile">แก้ไขโปรไฟล์</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/ticket">ดูตั๋ว</Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (
-            <div>
-              <Button as={Link} to="/login" variant="outline-success" className="me-2">
+            <Nav>
+              <Nav.Link as={Link} to="/login" className="text-primary fw-medium hover-link me-3">
                 เข้าสู่ระบบ
-              </Button>
-              <Button as={Link} to="/register" variant="success">
+              </Nav.Link>
+              <Nav.Link as={Link} to="/register" className="text-dark fw-medium hover-link">
                 สมัครสมาชิก
-              </Button>
-            </div>
+              </Nav.Link>
+            </Nav>
           )}
         </Navbar.Collapse>
       </Container>
     </Navbar>
+
   );
 }
 

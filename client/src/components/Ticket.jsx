@@ -63,6 +63,9 @@ const Ticket = () => {
         return 0;
     }) : [];
 
+    // ดึงข้อมูลการจองที่เลือก
+    const selectedBooking = bookings?.find((booking) => booking.id === selectedBookingId);
+
     return (
         <div className="ticket-container">
             <h2>ข้อมูลการจองของคุณ</h2>
@@ -78,7 +81,7 @@ const Ticket = () => {
                     </thead>
                     <tbody>
                         {sortedBookings.map((booking, index) => (
-                            <tr key={booking.id || `booking-${index}`}>
+                            <tr key={booking.id || `booking-${index}`} >
                                 <td>{booking.field}</td>
                                 <td>{formatDate(booking.date)}</td>
                                 <td>{booking.startTime} - {booking.endTime}</td>
@@ -94,12 +97,21 @@ const Ticket = () => {
             ) : (
                 <p className="no-bookings">ไม่มีข้อมูลการจอง</p>
             )}
-            {showQRCode && (
+            {showQRCode && selectedBooking && (
                 <div className="modal">
                     <div className="modal-content">
                         <span className="close" onClick={closeModal}>&times;</span>
                         <h3>QR Code การจอง</h3>
-                        <QRCode className="qr-code" value={`Booking ID: ${selectedBookingId}`} size={128} />
+                        <QRCode 
+                            className="qr-code" 
+                            value={encodeURIComponent(JSON.stringify({
+                                field: selectedBooking.field,
+                                date: selectedBooking.date,
+                                startTime: selectedBooking.startTime,
+                                endTime: selectedBooking.endTime,
+                            }))} 
+                            size={128} 
+                        />
                     </div>
                 </div>
             )}

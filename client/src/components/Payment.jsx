@@ -63,7 +63,7 @@ const Payment = () => {
     const resetCountdown = () => {
         if (countdownInterval) clearInterval(countdownInterval);
 
-        setTimeLeft(10);
+        setTimeLeft(300);
         const newInterval = setInterval(() => {
             setTimeLeft((prevTime) => {
                 if (prevTime <= 1) {

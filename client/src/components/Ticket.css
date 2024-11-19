@@ -2,7 +2,7 @@
 .ticket-container {
     max-width: 800px;
     margin: 0 auto;
-    margin-top: 5%;
+    margin-top: 150px;
     padding: 20px;
     text-align: center;
     background-color: #fff;
@@ -75,6 +75,7 @@ h2 {
     width: 300px;
     text-align: center;
     position: relative;
+    justify-content: center;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -100,4 +101,6 @@ h2 {
 
 .qr-code {
     justify-content: center;
+    width: auto;
+    height: auto;
 }

@@ -44,7 +44,9 @@ const App = () => {
           />
           <Route path="/ticket"
             element={
+              <PrivateRoute>
                 <Ticket />
+              </PrivateRoute>
             }
           />
         </Routes>
