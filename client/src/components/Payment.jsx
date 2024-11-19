@@ -75,6 +75,7 @@ const Payment = () => {
                         icon: 'warning',
                         confirmButtonText: 'ตกลง',
                     }).then(() => {
+
                         navigate('/booking');
                     });
 
