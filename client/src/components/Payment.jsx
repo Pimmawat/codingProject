@@ -63,12 +63,21 @@ const Payment = () => {
     const resetCountdown = () => {
         if (countdownInterval) clearInterval(countdownInterval);
 
-        setTimeLeft(300);
+        setTimeLeft(10);
         const newInterval = setInterval(() => {
             setTimeLeft((prevTime) => {
                 if (prevTime <= 1) {
                     clearInterval(newInterval);
                     setQrCodeUrl(null);
+                    Swal.fire({
+                        title: 'หมดเวลา',
+                        text: 'QR Code หมดอายุ กรุณาจองใหม่อีกครั้ง',
+                        icon: 'warning',
+                        confirmButtonText: 'ตกลง',
+                    }).then(() => {
+                        navigate('/booking');
+                    });
+
                     return 0;
                 }
                 return prevTime - 1;
@@ -77,6 +86,7 @@ const Payment = () => {
 
         setCountdownInterval(newInterval);
     };
+
 
     useEffect(() => {
         return () => {
@@ -114,7 +124,7 @@ const Payment = () => {
                     text: `${responseData.message}`,
                     icon: 'success',
                     confirmButtonText: 'ตกลง',
-                  }).then(() => {
+                }).then(() => {
                     handlePaymentSuccess();
                     navigate('/ticket');
                 });
@@ -134,12 +144,12 @@ const Payment = () => {
     const handlePaymentSuccess = async () => {
         try {
             const phone = localStorage.getItem('phone'); // ดึง phone จาก localStorage
-    
+
             const bookingData = {
                 ...state, // ข้อมูลการจองจาก state
                 phone,    // เพิ่ม phone เข้าไปในข้อมูลการจอง
             };
-    
+
             const response = await fetch('http://localhost:3001/api/bookings', {
                 method: 'POST',
                 headers: {
@@ -147,7 +157,7 @@ const Payment = () => {
                 },
                 body: JSON.stringify(bookingData), // ส่งข้อมูลการจองรวมถึง phone ไปยัง backend
             });
-    
+
             if (response.ok) {
                 Swal.fire({
                     icon: 'success',
@@ -171,6 +181,20 @@ const Payment = () => {
             });
         }
     };
+
+    const handlePaymentClick = () => {
+        if (qrCodeUrl && timeLeft > 0) {
+            Swal.fire({
+                title: 'QR Code ยังใช้งานได้',
+                text: `กรุณาชำระเงินให้เสร็จสิ้นภายในเวลาที่กำหนด (${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, '0')})`,
+                icon: 'info',
+                confirmButtonText: 'ตกลง',
+            });
+        } else {
+            handlePayment(); // เรียกฟังก์ชันสร้าง QR Code
+        }
+    };
+
 
     return (
         <div className="payment-form">
@@ -204,28 +228,38 @@ const Payment = () => {
                 </tbody>
             </table>
 
-            <button onClick={handlePayment} className="submit-btn" disabled={loading}>
+            <button
+                onClick={handlePaymentClick}
+                className="submit-btn"
+                disabled={loading}
+            >
                 {loading ? 'กำลังสร้าง QR Code...' : 'สร้าง QR code'}
             </button>
+
 
             {qrCodeUrl && timeLeft > 0 ? (
                 <div className="qr-code-section">
                     <h3>ชำระเงิน {amount} บาท</h3>
                     <p>กรุณาชำระภายใน {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')} นาที</p>
                     <img src={qrCodeUrl} alt="QR Code สำหรับชำระเงิน" />
-                    <p><br/>เมื่อชำระเสร็จแล้วให้กดปุ่มแนบสลีปด้านล่าง</p>
+                    <p><br />เมื่อชำระเสร็จแล้วให้กดปุ่มแนบสลีปด้านล่าง</p>
                 </div>
             ) : qrCodeUrl && timeLeft === 0 ? (
                 <p>QR Code หมดอายุแล้ว กรุณาสร้างใหม่</p>
             ) : null}
 
             <div className="upload-section">
-                <input type="file" onChange={handleFileChange} accept="image/*" />
-                {filePreview && <img src={filePreview} alt="ตัวอย่างสลิป" className="file-preview" />}
-                <button onClick={handleFileUpload} className="submit-btn">
-                    แนบสลิปและส่ง
-                </button>
+                {qrCodeUrl && timeLeft > 0 && (
+                    <>
+                        <input type="file" onChange={handleFileChange} accept="image/*" />
+                        {filePreview && <img src={filePreview} alt="ตัวอย่างสลิป" className="file-preview" />}
+                        <button onClick={handleFileUpload} className="submit-btn">
+                            แนบสลิปและส่ง
+                        </button>
+                    </>
+                )}
             </div>
+
         </div>
     );
 };
