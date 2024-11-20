@@ -217,9 +217,9 @@ app.post("/api/verify-qrcode", (req, res) => {
 
     // ตรวจสอบว่าเวลาปัจจุบันอยู่ในช่วงระหว่าง startTime และ endTime หรือไม่
     if (currentTime.isBetween(qrStartDateTime, qrEndDateTime, null, '[)')) {
-      return res.status(200).json({ success: true, message: "QR code ถูกต้อง", bookingInfo });
+      return res.status(200).json({ success: true, message: "วันที่และเวลาถูกต้อง", bookingInfo });
     } else {
-      return res.status(400).json({ success: false, message: "QR Code ไม่ถูกต้อง" });
+      return res.status(400).json({ success: false, message: "วันที่หรือเวลาไม่ถูกต้อง" });
     }
   } catch (error) {
     console.error(error);

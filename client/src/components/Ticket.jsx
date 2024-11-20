@@ -11,7 +11,7 @@ const Ticket = () => {
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'asc' });
 
-    const phone = user?.phone || localStorage.getItem('phone'); 
+    const phone = user?.phone || localStorage.getItem('phone');
 
     if (!phone) {
         return <Loading />;
@@ -20,17 +20,19 @@ const Ticket = () => {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/tickets?phone=${phone}`); 
+                const response = await fetch(`http://localhost:3001/api/tickets?phone=${phone}`);
                 const data = await response.json();
+                console.log(data);
                 setBookings(data);
             } catch (error) {
                 console.error('Error fetching bookings:', error);
             }
         };
         fetchBookings();
-    }, [phone]); 
+    }, [phone]);
 
     const openModal = (bookingId) => {
+        console.log('Selected Booking ID:', bookingId);
         setSelectedBookingId(bookingId);
         setShowQRCode(true);
     };
@@ -102,15 +104,15 @@ const Ticket = () => {
                     <div className="modal-content">
                         <span className="close" onClick={closeModal}>&times;</span>
                         <h3>QR Code การจอง</h3>
-                        <QRCode 
-                            className="qr-code" 
+                        <QRCode
+                            className="qr-code"
                             value={encodeURIComponent(JSON.stringify({
                                 field: selectedBooking.field,
                                 date: selectedBooking.date,
                                 startTime: selectedBooking.startTime,
                                 endTime: selectedBooking.endTime,
-                            }))} 
-                            size={128} 
+                            }))}
+                            size={128}
                         />
                     </div>
                 </div>

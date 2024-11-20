@@ -44,7 +44,7 @@ const Booking = () => {
         const times = [];
         const filteredBookings = getFilteredBookings();
 
-        for (let hour = 17; hour <= 23; hour++) {
+        for (let hour = 12; hour <= 23; hour++) {
             const timeString = `${hour.toString().padStart(2, '0')}:00`;
 
             // ตรวจสอบว่าเวลานี้ถูกจองไปแล้วหรือไม่
