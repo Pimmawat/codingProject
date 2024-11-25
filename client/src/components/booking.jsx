@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Booking.css';
+import './css/Booking.css';
 import Swal from 'sweetalert2';
 import { useUser } from './userContext';
 import { useNavigate } from 'react-router-dom';
@@ -43,19 +43,27 @@ const Booking = () => {
     const generateTimeOptions = () => {
         const times = [];
         const filteredBookings = getFilteredBookings();
-
+        const currentDateTime = new Date(); // วันที่และเวลาปัจจุบัน
+        const selectedDate = new Date(date);
+    
         for (let hour = 12; hour <= 23; hour++) {
             const timeString = `${hour.toString().padStart(2, '0')}:00`;
-
+            const optionTime = new Date(`${date}T${timeString}`); // สร้าง Date object สำหรับเวลาที่จะตรวจสอบ
+            // ตรวจสอบว่าเวลานี้ผ่านไปแล้วหรือไม่
+            const isPast = selectedDate.toDateString() === currentDateTime.toDateString()
+                ? optionTime < currentDateTime
+                : selectedDate < currentDateTime;
+    
             // ตรวจสอบว่าเวลานี้ถูกจองไปแล้วหรือไม่
             const isBooked = filteredBookings.some(
                 (booking) => timeString >= booking.startTime && timeString < booking.endTime
             );
-
-            times.push({ time: timeString, disabled: isBooked });
+    
+            times.push({ time: timeString, disabled: isPast || isBooked });
         }
         return times;
     };
+
     const calculateTimeDifference = (start, end) => {
         const startHour = parseInt(start.split(':')[0], 10);
         const endHour = parseInt(end.split(':')[0], 10);
@@ -64,10 +72,24 @@ const Booking = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        // ตรวจสอบว่าเวลาจองผ่านไปแล้วหรือไม่
+        const currentDateTime = new Date();
+        const startDateTime = new Date(`${date}T${startTime}`);
+        const endDateTime = new Date(`${date}T${endTime}`);
+    
+        if (startDateTime < currentDateTime || endDateTime < currentDateTime) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ไม่สามารถจองได้',
+                text: 'วันหรือเวลาที่เลือกผ่านไปแล้ว',
+            });
+            return;
+        }
+    
         const difference = calculateTimeDifference(startTime, endTime);
         setTimeDiff(difference);
-
+    
         const bookingData = {
             field,
             date,
@@ -76,12 +98,13 @@ const Booking = () => {
             timeUsed: difference,
             name: user.name,
         };
+    
         Swal.fire({
             icon: 'success',
             title: 'การจองของคุณพร้อมแล้ว',
             text: 'ระบบกำลังพาคุณไปยังหน้าชำระเงิน',
         });
-
+    
         // นำไปยังหน้าชำระเงินพร้อมข้อมูลการจอง
         navigate('/payment', { state: bookingData });
     };
@@ -126,7 +149,7 @@ const Booking = () => {
                     <option value="">เลือกเวลาเริ่มต้น</option>
                     {generateTimeOptions().map(({ time, disabled }) => (
                         <option key={time} value={time} disabled={disabled}>
-                            {time} {disabled ? '(จองแล้ว)' : ''}
+                            {time} {disabled ? 'จองแล้ว' : ''}
                         </option>
                     ))}
                 </select>

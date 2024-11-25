@@ -9,6 +9,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Home from './components/Home';
 import Payment from './components/Payment';
 import Ticket from './components/Ticket';
+import NotFound from './components/404notfound';
 
 const App = () => {
 
@@ -25,6 +26,7 @@ const App = () => {
       <Router>
         <Navbar1 />
         <Routes>
+          <Route path='*' element = {<NotFound />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
           <Route path="/" element={<Home />} />

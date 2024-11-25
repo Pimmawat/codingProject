@@ -53,6 +53,13 @@ h2 {
     background-color: #0056b3;
 }
 
+.qr-button:disabled {
+    background-color: #d6d6d6; /* สีเทาเมื่อปิดการใช้งาน */
+    color: #888888; /* สีตัวอักษรอ่อนลง */
+    cursor: not-allowed; /* เปลี่ยน cursor */
+    text-decoration: line-through solid hotpink;
+}
+
 /* Modal */
 .modal {
     position: fixed;

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Loading from './Loading';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import './Payment.css';
+import './css/Payment.css';
 
 
 const Payment = () => {

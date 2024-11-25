@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Register.css'; // นำเข้าไฟล์ CSS
+import './css/Register.css'; // นำเข้าไฟล์ CSS
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom'; // นำเข้า useNavigate
 
