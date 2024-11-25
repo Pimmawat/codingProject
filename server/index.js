@@ -20,18 +20,11 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
-const bookings = [
-  {
-    id: "123",
-    date: "2024-11-22",
-    startTime: "2:00",
-    endTime: "4:00"
-  }
-];
 db.connect((err) => {
   if (err) throw err;
   console.log('Connected to MySQL');
 });
+
 
 app.post('/api/bookings', (req, res) => {
   const { field, date, startTime, endTime, timeUsed, name, phone } = req.body;
@@ -195,51 +188,70 @@ app.get('/api/tickets', (req, res) => {
   });
 });
 
-app.post("/api/verify-qrcode", (req, res) => {
-  const qrData = req.body;
+app.post("/api/verify-qrcode", async (req, res) => {
 
-  if (!qrData || !qrData.bookingId || !qrData.date || !qrData.startTime || !qrData.endTime) {
-    return res.status(400).json({
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  };
+  
+  try {
+    const qrData = req.body;
+    console.log(qrData);
+
+    if(qrData.secretCode != "H3110man"){
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+
+    // ตรวจสอบรูปแบบข้อมูลใน QR Code
+    if (!qrData.date || !qrData.startTime || !qrData.endTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid QR Code format",
+      });
+    }
+
+    const { date, startTime, endTime } = qrData;
+
+    // แปลงเวลาให้อยู่ในรูปแบบ 24 ชั่วโมง
+    const formattedStartTime = formatTime(startTime);
+    const formattedEndTime = formatTime(endTime);
+
+    // ตรวจสอบรูปแบบวันที่และเวลา
+    const bookingStartDateTime = dayjs(`${date} ${formattedStartTime}`);
+    const bookingEndDateTime = dayjs(`${date} ${formattedEndTime}`);
+
+    if (!bookingStartDateTime.isValid() || !bookingEndDateTime.isValid()) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid date or time format",
+      });
+    }
+
+    // ตรวจสอบช่วงเวลาการจอง
+    const currentDateTime = dayjs();
+    if (currentDateTime.isBefore(bookingStartDateTime) || currentDateTime.isAfter(bookingEndDateTime)) {
+      return res.status(400).json({
+        success: false,
+        message: "The booking is not valid at this time",
+      });
+    }
+
+    // ถ้าข้อมูลทั้งหมดถูกต้อง
+    return res.status(200).json({
+      success: true,
+      message: "QR Code is valid",
+    });
+  } catch (error) {
+    console.error("Error verifying QR Code:", error.message);
+    return res.status(500).json({
       success: false,
-      message: "Invalid QR Code format",
+      message: "Internal server error",
     });
   }
-  const { bookingId, date, startTime, endTime } = qrData;
-
-  // ตรวจสอบการจองจากฐานข้อมูล
-  const booking = bookings.find((b) => b.id === bookingId);
-
-  if (!booking) {
-    return res.status(404).json({
-      success: false,
-      message: "Booking not found",
-    });
-  }
-
-  const currentDateTime = dayjs();
-  const bookingStartDateTime = dayjs(`${date} ${startTime}`);
-  const bookingEndDateTime = dayjs(`${date} ${endTime}`);
-
-  if (!bookingStartDateTime.isValid() || !bookingEndDateTime.isValid()) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid date or time format",
-    });
-  }
-
-  if (currentDateTime.isBefore(bookingStartDateTime) || currentDateTime.isAfter(bookingEndDateTime)) {
-    return res.status(400).json({
-      success: false,
-      message: "The booking is not valid at this time",
-    });
-  }
-
-  // ถ้าข้อมูลทั้งหมดถูกต้อง
-  return res.status(200).json({
-    success: true,
-    message: "QR Code is valid",
-    data: booking,
-  });
 });
 
 app.listen(3001, () => {

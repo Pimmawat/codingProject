@@ -42,6 +42,7 @@ function Navbar1() {
               <Dropdown.Menu>
                 <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
                 <Dropdown.Item as={Link} to="/ticket">ดูตั๋ว</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/point">แลกแต้ม</Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

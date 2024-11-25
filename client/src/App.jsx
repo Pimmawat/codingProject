@@ -10,6 +10,8 @@ import Home from './components/Home';
 import Payment from './components/Payment';
 import Ticket from './components/Ticket';
 import NotFound from './components/404notfound';
+import Points from './components/point';
+
 
 const App = () => {
 
@@ -48,6 +50,13 @@ const App = () => {
             element={
               <PrivateRoute>
                 <Ticket />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/point"
+            element={
+              <PrivateRoute>
+                <Points />
               </PrivateRoute>
             }
           />
