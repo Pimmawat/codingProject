@@ -91,12 +91,12 @@ const Booking = () => {
         setTimeDiff(difference);
     
         const bookingData = {
+            id: user.id,
             field,
             date,
             startTime,
             endTime,
             timeUsed: difference,
-            name: user.name,
         };
     
         Swal.fire({
@@ -171,11 +171,6 @@ const Booking = () => {
                         </option>
                     ))}
                 </select>
-            </div>
-
-            <div className='form-group'>
-                <label htmlFor="name">จองโดย</label>
-                <input type="text" id="name" value={user.name} disabled />
             </div>
 
             <button type="submit" className="submit-btn">ยืนยันการจอง</button>

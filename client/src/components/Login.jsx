@@ -39,10 +39,14 @@ const Login = ({ handleLoginSuccess }) => {
 
       const data = await response.json();
       if (response.ok) {
-        setUser({ name: data.name });
+        setUser({
+          id: data.id,
+          name: data.name,
+          phone: data.phone,
+          point: data.point,
+        });
         localStorage.setItem('token', data.token);
-        localStorage.setItem('phone', phone);
-        handleLoginSuccess(data.name);
+        handleLoginSuccess(data);
         Swal.fire({
           title: 'เข้าสู่ระบบสำเร็จ!',
           text: data.message,

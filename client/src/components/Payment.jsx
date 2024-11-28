@@ -30,6 +30,7 @@ const Payment = () => {
     if (!state) {
         return <Loading />;
     }
+    console.log(state);
 
     const handlePayment = async () => {
         if (!state || !state.timeUsed) return;
@@ -144,11 +145,8 @@ const Payment = () => {
 
     const handlePaymentSuccess = async () => {
         try {
-            const phone = localStorage.getItem('phone'); // ดึง phone จาก localStorage
-
             const bookingData = {
-                ...state, // ข้อมูลการจองจาก state
-                phone,    // เพิ่ม phone เข้าไปในข้อมูลการจอง
+                ...state
             };
 
             const response = await fetch('http://localhost:3001/api/bookings', {
@@ -221,10 +219,6 @@ const Payment = () => {
                     <tr>
                         <th>เวลาที่ใช้</th>
                         <td>{state.timeUsed} ชั่วโมง</td>
-                    </tr>
-                    <tr>
-                        <th>จองโดย</th>
-                        <td>{state.name}</td>
                     </tr>
                 </tbody>
             </table>

@@ -11,16 +11,16 @@ const Ticket = () => {
     const [selectedBookingId, setSelectedBookingId] = useState(null);
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'asc' });
 
-    const phone = user?.phone || localStorage.getItem('phone');
+    console.log(user.id); // เปลี่ยนจาก phone เป็น user_id
 
-    if (!phone) {
+    if (!user.id) {
         return <Loading />;
     }
 
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/tickets?phone=${phone}`);
+                const response = await fetch(`http://localhost:3001/api/tickets?user_id=${user.id}`); // ใช้ user_id แทน phone
                 const data = await response.json();
                 console.log(data);
                 setBookings(data);
@@ -29,7 +29,7 @@ const Ticket = () => {
             }
         };
         fetchBookings();
-    }, [phone]);
+    }, [user.id]);
 
     const openModal = (bookingId) => {
         console.log('Selected Booking ID:', bookingId);
@@ -53,6 +53,11 @@ const Ticket = () => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+
+    const formatTime = (timeString) => {
+        const time = new Date(`1970-01-01T${timeString}Z`); // สร้าง Date object จากเวลา
+        return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`; // ใช้แค่ชั่วโมงและนาที
     };
 
     const sortedBookings = bookings ? [...bookings].sort((a, b) => {
@@ -105,7 +110,6 @@ const Ticket = () => {
                             );
                         })}
                     </tbody>
-
                 </table>
             ) : (
                 <p className="no-bookings">ไม่มีข้อมูลการจอง</p>
@@ -122,8 +126,8 @@ const Ticket = () => {
                                 date: selectedBooking.date,
                                 startTime: selectedBooking.startTime,
                                 endTime: selectedBooking.endTime,
-                            })
-                            } size={128}
+                            })}
+                            size={128}
                         />
                     </div>
                 </div>

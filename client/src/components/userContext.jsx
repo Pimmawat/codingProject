@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser, phone, setPhone] = useState(() => {
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
@@ -14,7 +14,6 @@ export const UserProvider = ({ children }) => {
     } else {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
-      localStorage.removeItem('phone');
     }
   }, [user]);
 

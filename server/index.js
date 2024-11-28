@@ -25,13 +25,12 @@ db.connect((err) => {
   console.log('Connected to MySQL');
 });
 
-
 app.post('/api/bookings', (req, res) => {
-  const { field, date, startTime, endTime, timeUsed, name, phone } = req.body;
-  console.log(field, date, startTime, endTime, timeUsed, name, phone);
+  const { id, field, date, startTime, endTime, timeUsed } = req.body;
+  console.log(id,field, date, startTime, endTime, timeUsed);
 
   const checkQuery = `
-SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
+SELECT * FROM reserve1 WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
   `;
   db.query(checkQuery, [field, date, endTime, startTime], (err, results) => {
     if (err) return res.status(500).send(err);
@@ -39,8 +38,8 @@ SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTim
       return res.status(400).send({ message: 'เวลานี้ถูกจองแล้ว' });
     }
 
-    const query = `INSERT INTO reserve (field, date, startTime, endTime, timeUsed, name, phone) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    db.query(query, [field, date, startTime, endTime, timeUsed, name, phone], (err, result) => {
+    const query = `INSERT INTO reserve1 (user_id, field, date, startTime, endTime, timeUsed) VALUES (?, ?, ?, ?, ?, ?)`;
+    db.query(query, [id, field, date, startTime, endTime, timeUsed], (err, result) => {
       if (err) return res.status(500).send(err);
       res.status(201).send({ message: 'จองสำเร็จ', bookingId: result.insertId });
     });
@@ -48,7 +47,7 @@ SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTim
 });
 
 app.get('/api/bookings', (req, res) => {
-  const sql = 'SELECT * FROM reserve';
+  const sql = 'SELECT * FROM reserve1';
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -72,7 +71,7 @@ app.post('/api/member/register', (req, res) => {
     return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
   }
 
-  const checkQuery = 'SELECT * FROM users WHERE phone = ?';
+  const checkQuery = 'SELECT * FROM users1 WHERE phone = ?';
   db.query(checkQuery, [phone], (err, existingUser) => {
     if (err) {
       console.error(err);
@@ -89,7 +88,7 @@ app.post('/api/member/register', (req, res) => {
         return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน' });
       }
 
-      const insertQuery = 'INSERT INTO users (name, phone, password) VALUES (?, ?, ?)';
+      const insertQuery = 'INSERT INTO users1 (name, phone, password) VALUES (?, ?, ?)';
       db.query(insertQuery, [name, phone, hash], (err, result) => {
         if (err) {
           console.error(err);
@@ -104,7 +103,7 @@ app.post('/api/member/register', (req, res) => {
 app.post('/api/member/login', (req, res) => {
   const { phone, password } = req.body;
 
-  const query = 'SELECT * FROM users WHERE phone = ?';
+  const query = 'SELECT * FROM users1 WHERE phone = ?';
   db.query(query, [phone], (err, result) => {
     if (err) {
       return res.status(500).json({ message: 'Server error' });
@@ -121,8 +120,8 @@ app.post('/api/member/login', (req, res) => {
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid phone or password' });
       }
-      const token = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
-      return res.status(200).json({ message: 'Login successful', name: user.name, token });
+      const token = jwt.sign({ id: user.id, name: user.name}, JWT_SECRET, { expiresIn: '1h' });
+      return res.status(200).json({ message: 'Login successful', id: user.id, name: user.name, phone: user.phone, point: user.total_points, token });
     });
   });
 });
@@ -171,10 +170,10 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
 });
 
 app.get('/api/tickets', (req, res) => {
-  const sql = 'SELECT * FROM reserve WHERE phone = ?';
-  const phone = req.query.phone;
+  const sql = 'SELECT * FROM reserve1 WHERE user_id = ?';
+  const user_id = req.query.user_id;
 
-  db.query(sql, [phone], (err, results) => {
+  db.query(sql, [user_id], (err, results) => {
     if (err) {
       console.error('Error fetching bookings:', err);
       res.status(500).send('Error fetching bookings');
@@ -230,7 +229,6 @@ app.post("/api/verify-qrcode", async (req, res) => {
         message: "Invalid date or time format",
       });
     }
-
     // ตรวจสอบช่วงเวลาการจอง
     const currentDateTime = dayjs();
     if (currentDateTime.isBefore(bookingStartDateTime) || currentDateTime.isAfter(bookingEndDateTime)) {
@@ -239,7 +237,6 @@ app.post("/api/verify-qrcode", async (req, res) => {
         message: "The booking is not valid at this time",
       });
     }
-
     // ถ้าข้อมูลทั้งหมดถูกต้อง
     return res.status(200).json({
       success: true,
