@@ -30,7 +30,7 @@ app.post('/api/bookings', (req, res) => {
   console.log(id,field, date, startTime, endTime, timeUsed);
 
   const checkQuery = `
-SELECT * FROM reserve1 WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
+SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
   `;
   db.query(checkQuery, [field, date, endTime, startTime], (err, results) => {
     if (err) return res.status(500).send(err);
@@ -38,7 +38,7 @@ SELECT * FROM reserve1 WHERE field = ? AND date = ? AND (startTime < ? AND endTi
       return res.status(400).send({ message: 'เวลานี้ถูกจองแล้ว' });
     }
 
-    const query = `INSERT INTO reserve1 (user_id, field, date, startTime, endTime, timeUsed) VALUES (?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed) VALUES (?, ?, ?, ?, ?, ?)`;
     db.query(query, [id, field, date, startTime, endTime, timeUsed], (err, result) => {
       if (err) return res.status(500).send(err);
       res.status(201).send({ message: 'จองสำเร็จ', bookingId: result.insertId });
@@ -47,7 +47,7 @@ SELECT * FROM reserve1 WHERE field = ? AND date = ? AND (startTime < ? AND endTi
 });
 
 app.get('/api/bookings', (req, res) => {
-  const sql = 'SELECT * FROM reserve1';
+  const sql = 'SELECT * FROM reserve';
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -71,7 +71,7 @@ app.post('/api/member/register', (req, res) => {
     return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
   }
 
-  const checkQuery = 'SELECT * FROM users1 WHERE phone = ?';
+  const checkQuery = 'SELECT * FROM users WHERE phone = ?';
   db.query(checkQuery, [phone], (err, existingUser) => {
     if (err) {
       console.error(err);
@@ -88,7 +88,7 @@ app.post('/api/member/register', (req, res) => {
         return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน' });
       }
 
-      const insertQuery = 'INSERT INTO users1 (name, phone, password) VALUES (?, ?, ?)';
+      const insertQuery = 'INSERT INTO users (name, phone, password) VALUES (?, ?, ?)';
       db.query(insertQuery, [name, phone, hash], (err, result) => {
         if (err) {
           console.error(err);
@@ -103,7 +103,7 @@ app.post('/api/member/register', (req, res) => {
 app.post('/api/member/login', (req, res) => {
   const { phone, password } = req.body;
 
-  const query = 'SELECT * FROM users1 WHERE phone = ?';
+  const query = 'SELECT * FROM users WHERE phone = ?';
   db.query(query, [phone], (err, result) => {
     if (err) {
       return res.status(500).json({ message: 'Server error' });
@@ -170,7 +170,7 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
 });
 
 app.get('/api/tickets', (req, res) => {
-  const sql = 'SELECT * FROM reserve1 WHERE user_id = ?';
+  const sql = 'SELECT * FROM reserve WHERE user_id = ?';
   const user_id = req.query.user_id;
 
   db.query(sql, [user_id], (err, results) => {
@@ -209,7 +209,7 @@ app.post("/api/verify-qrcode", async (req, res) => {
     if (!qrData.date || !qrData.startTime || !qrData.endTime) {
       return res.status(400).json({
         success: false,
-        message: "Invalid QR Code format",
+        message: "Invalid QR Code format",    
       });
     }
 
