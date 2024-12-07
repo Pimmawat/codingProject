@@ -10,9 +10,11 @@ const FormData = require('form-data');
 const axios = require("axios");
 const dayjs = require("dayjs");
 const isBetween = require('dayjs/plugin/isBetween');
+const verifyAdmin = require('./middlewares/verifyAdmin');
 dayjs.extend(isBetween);
 
 const JWT_SECRET = 'hellohackerman';
+
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
 
@@ -27,10 +29,10 @@ db.connect((err) => {
 
 app.post('/api/bookings', (req, res) => {
   const { id, field, date, startTime, endTime, timeUsed } = req.body;
-  console.log(id,field, date, startTime, endTime, timeUsed);
+  console.log(id, field, date, startTime, endTime, timeUsed);
 
   const checkQuery = `
-SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
+    SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
   `;
   db.query(checkQuery, [field, date, endTime, startTime], (err, results) => {
     if (err) return res.status(500).send(err);
@@ -38,10 +40,25 @@ SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTim
       return res.status(400).send({ message: 'เวลานี้ถูกจองแล้ว' });
     }
 
-    const query = `INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed) VALUES (?, ?, ?, ?, ?, ?)`;
+    const query = `
+      INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed) 
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
     db.query(query, [id, field, date, startTime, endTime, timeUsed], (err, result) => {
       if (err) return res.status(500).send(err);
-      res.status(201).send({ message: 'จองสำเร็จ', bookingId: result.insertId });
+
+      // คำนวณแต้มจากจำนวนชั่วโมง
+      const points = timeUsed * 10; // 10 แต้มต่อชั่วโมง
+
+      const pointsQuery = `
+        INSERT INTO points (user_id, booking_id, points) 
+        VALUES (?, ?, ?) 
+        ON DUPLICATE KEY UPDATE points = points + VALUES(points)
+      `;
+      db.query(pointsQuery, [id, result.insertId, points], (err) => {
+        if (err) return res.status(500).send(err);
+        res.status(201).send({ message: 'จองสำเร็จ', bookingId: result.insertId });
+      });
     });
   });
 });
@@ -120,7 +137,7 @@ app.post('/api/member/login', (req, res) => {
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid phone or password' });
       }
-      const token = jwt.sign({ id: user.id, name: user.name}, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
       return res.status(200).json({ message: 'Login successful', id: user.id, name: user.name, phone: user.phone, point: user.total_points, token });
     });
   });
@@ -187,18 +204,36 @@ app.get('/api/tickets', (req, res) => {
   });
 });
 
+app.get('/api/points', (req, res) => {
+  const sql = 'SELECT * FROM points WHERE user_id = ?';
+  const user_id = req.query.user_id;
+
+  db.query(sql, [user_id], (err, results) => {
+    if (err) {
+      console.error('Error fetching bookings:', err);
+      res.status(500).send('Error fetching bookings');
+    } else {
+      if (Array.isArray(results)) {
+        res.json(results);
+      } else {
+        res.json([]);
+      }
+    }
+  });
+});
+
 app.post("/api/verify-qrcode", async (req, res) => {
 
   const formatTime = (time) => {
     const [hours, minutes] = time.split(":").map(Number);
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
-  
+
   try {
     const qrData = req.body;
     console.log(qrData);
 
-    if(qrData.secretCode != "H3110man"){
+    if (qrData.secretCode != "H3110man") {
       return res.status(500).json({
         success: false,
         message: "Internal server error",
@@ -209,7 +244,7 @@ app.post("/api/verify-qrcode", async (req, res) => {
     if (!qrData.date || !qrData.startTime || !qrData.endTime) {
       return res.status(400).json({
         success: false,
-        message: "Invalid QR Code format",    
+        message: "Invalid QR Code format",
       });
     }
 
@@ -249,6 +284,54 @@ app.post("/api/verify-qrcode", async (req, res) => {
       message: "Internal server error",
     });
   }
+});
+
+app.get('/api/points', (req, res) => {
+  const { user_id } = req.query;
+  console.log('Received user_id:', user_id); // ตรวจสอบค่า user_id ใน console
+
+  const query = `SELECT SUM(points) AS totalPoints FROM points WHERE user_id = ?`;
+
+  db.query(query, [user_id], (err, results) => {
+    if (err) {
+      console.error('Error fetching points:', err);
+      return res.status(500).send({ message: 'Server error' });
+    }
+
+    const totalPoints = results[0]?.totalPoints || 0; // ถ้าไม่มีแต้ม ให้แสดง 0
+    console.log(totalPoints);
+    res.status(200).send({ totalPoints });
+  });
+});
+
+//Admin
+
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+
+  const query = 'SELECT * FROM admins WHERE username = ?';
+  db.query(query,[username], (err, result) => {
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Admin ไม่พบ' });
+    }
+    const admin = result[0];
+    // ตรวจสอบรหัสผ่าน
+    bcrypt.compare(password, admin.password, (err, isMatch) => {
+      if (err) {
+        return res.status(500).json({ message: 'Server error' });
+      }
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid phone or password' });
+      }
+      const token = jwt.sign({ id: admin.id, role: admin.name }, JWT_SECRET, { expiresIn: '1h' });
+      return res.status(200).json({ message: 'Login successful', id: admin.id, name: admin.name, phone: admin.phone, point: admin.total_points, token });
+    });
+  });
+});
+
+
+app.get('/admin/dashboard', verifyAdmin, (req, res) => {
+  res.json({ message: 'ยินดีต้อนรับสู่ Admin Dashboard' });
 });
 
 app.listen(3001, () => {

@@ -40,9 +40,18 @@ function Navbar1() {
                 {user.name}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
-                <Dropdown.Item as={Link} to="/ticket">ดูตั๋ว</Dropdown.Item>
-                <Dropdown.Item as={Link} to="/point">แลกแต้ม</Dropdown.Item>
+                {user.role === 'admin' ? (
+                  <>
+                    <Dropdown.Item as={Link} to="/admin/dashboard">แดชบอร์ด Admin</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/admin/users">จัดการผู้ใช้</Dropdown.Item>
+                  </>
+                ) : (
+                  <>
+                    <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/ticket">ดูตั๋ว</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/points">แลกแต้ม</Dropdown.Item>
+                  </>
+                )}
                 <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -59,7 +68,6 @@ function Navbar1() {
         </Navbar.Collapse>
       </Container>
     </Navbar>
-
   );
 }
 

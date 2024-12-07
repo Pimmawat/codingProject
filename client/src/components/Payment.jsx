@@ -194,6 +194,11 @@ const Payment = () => {
         }
     };
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
+
 
     return (
         <div className="payment-form">
@@ -206,7 +211,7 @@ const Payment = () => {
                     </tr>
                     <tr>
                         <th>วันที่</th>
-                        <td>{state.date}</td>
+                        <td>{formatDate(state.date)}</td>
                     </tr>
                     <tr>
                         <th>เวลาเริ่ม</th>

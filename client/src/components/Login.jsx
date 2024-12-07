@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from './userContext';
 
 const Login = ({ handleLoginSuccess }) => {
-  const { user, setUser } = useUser(); 
+  const { user, setUser } = useUser();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(user) {
+    if (user) {
       navigate('/ticket');
     }
   }, [user, navigate]);
@@ -24,7 +24,7 @@ const Login = ({ handleLoginSuccess }) => {
       setPassword(value);
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,7 +53,7 @@ const Login = ({ handleLoginSuccess }) => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          navigate('/ticket'); 
+          navigate('/ticket');
         });
       } else {
         Swal.fire({
@@ -75,34 +75,39 @@ const Login = ({ handleLoginSuccess }) => {
   };
 
   return (
-    <div className="login-form">
-      <h2>เข้าสู่ระบบ</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="phone">เบอร์โทร:</label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            value={phone} 
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">รหัสผ่าน:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
-      </form>
-    </div>
+    <>
+      <div className="login-form">
+        <h2>เข้าสู่ระบบ</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="phone">เบอร์โทร:</label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">รหัสผ่าน:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
+        </form>
+      </div>
+      <div className="admin-button" >
+        <a href="/admin/login">สำหรับแอดมิน</a>
+      </div>
+    </>
   );
 };
 

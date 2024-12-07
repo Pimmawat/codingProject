@@ -41,21 +41,3 @@ input {
 .submit-button:hover {
   background-color: #0056b3;
 }
-a {
-  color: black;
-}
-.admin-button {
-  text-align: center;
-  margin-top: 20px;
-  width: 20%;
-  padding: 10px;
-  color: white;
-  border:rgb(0, 0, 0);
-  border-radius: 5px;
-  cursor: pointer;
-  justify-self: center;
-}
-
-.admin-button:hover {
-  background-color: #f1f1f1;
-}

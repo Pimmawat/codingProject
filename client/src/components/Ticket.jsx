@@ -55,11 +55,6 @@ const Ticket = () => {
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
 
-    const formatTime = (timeString) => {
-        const time = new Date(`1970-01-01T${timeString}Z`); // สร้าง Date object จากเวลา
-        return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`; // ใช้แค่ชั่วโมงและนาที
-    };
-
     const sortedBookings = bookings ? [...bookings].sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
             return sortConfig.direction === 'asc' ? 1 : -1;

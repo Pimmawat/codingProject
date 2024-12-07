@@ -10,8 +10,9 @@ import Home from './components/Home';
 import Payment from './components/Payment';
 import Ticket from './components/Ticket';
 import NotFound from './components/404notfound';
-import Points from './components/point';
-
+import Points from './components/Points';
+//admin
+import AdminLogin from './components/AdminLogin';
 
 const App = () => {
 
@@ -29,9 +30,11 @@ const App = () => {
         <Navbar1 />
         <Routes>
           <Route path='*' element = {<NotFound />} />
+          <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+
           <Route path="/booking"
             element={
               <PrivateRoute>
@@ -53,7 +56,7 @@ const App = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/point"
+          <Route path="/points"
             element={
               <PrivateRoute>
                 <Points />
