@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import './css/Register.css'; // นำเข้าไฟล์ CSS
+import React, { useState , useEffect} from 'react';
+import './css/Register.css';
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom'; // นำเข้า useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 const Register = () => {
   const [form, setForm] = useState({
     name: '',
     phone: '',
+    email: '',
     password: '',
   });
-  
-  const navigate = useNavigate(); // สร้าง instance ของ useNavigate
+
+  const navigate = useNavigate(); 
+  const [isOTPStage, setIsOTPStage] = useState(false);
+  const [otpData, setOtpData] = useState({ phone: '', otp: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,7 +22,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const phonePattern = /^[0-9]{10}$/;
     if (!phonePattern.test(form.phone)) {
       return Swal.fire({
@@ -29,7 +32,7 @@ const Register = () => {
         confirmButtonText: 'ตกลง',
       });
     }
-  
+
     try {
       const response = await fetch('http://localhost:3001/api/member/register', {
         method: 'POST',
@@ -38,9 +41,9 @@ const Register = () => {
         },
         body: JSON.stringify(form),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         Swal.fire({
           title: 'สำเร็จ!',
@@ -48,12 +51,11 @@ const Register = () => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          navigate('/login'); 
+          setOtpData((prev) => ({ ...prev, phone: form.phone }));
+          setIsOTPStage(true);
         });
-  
-        setForm({ name: '', phone: '', password: '' }); 
+        setForm({ name: '', email: '', phone: '', password: '' });
       } else {
-        
         Swal.fire({
           title: 'ข้อผิดพลาด!',
           text: data.message,
@@ -63,7 +65,7 @@ const Register = () => {
       }
     } catch (error) {
       console.error(error);
-     
+
       Swal.fire({
         title: 'เกิดข้อผิดพลาด!',
         text: 'เกิดข้อผิดพลาดในการลงทะเบียน',
@@ -72,6 +74,72 @@ const Register = () => {
       });
     }
   };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+
+    console.log('Payload:', otpData);
+    try {
+      const response = await fetch('http://localhost:3001/api/member/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ otpData }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          title: 'ยืนยันสำเร็จ!',
+          text: data.message,
+          icon: 'success',
+          confirmButtonText: 'ตกลง',
+        }).then(() => {
+          navigate('/login')
+        });
+      } else {
+        Swal.fire({
+          title: 'ข้อผิดพลาด!',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'ตกลง',
+        }).then(() => {
+          navigate('/login');
+      })};
+    } catch (error) {
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด!',
+        text: 'เกิดข้อผิดพลาดในการยืนยัน OTP',
+        icon: 'error',
+        confirmButtonText: 'ตกลง',
+      });
+    }
+  };
+  
+  if (isOTPStage) {
+    return (
+      <div className="otp-verification">
+        <h2>ยืนยัน OTP</h2>
+        <form onSubmit={handleVerifyOTP}>
+          <div className="form-group">
+            <label htmlFor="otp">OTP:</label>
+            <input
+              type="text"
+              id="otp"
+              name="otp"
+              value={otpData.otp} 
+              onChange={(e) => setOtpData((prev) => ({ ...prev, otp: e.target.value }))} // อัปเดต otp
+              required
+            />
+
+          </div>
+          <button type="submit" className="submit-button">ยืนยัน</button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="register-form">
@@ -84,6 +152,17 @@ const Register = () => {
             id="name"
             name="name"
             value={form.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">อีเมลล์:</label>
+          <input
+            type="text"
+            id="email"
+            name="email"
+            value={form.email}
             onChange={handleChange}
             required
           />

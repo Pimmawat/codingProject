@@ -31,6 +31,7 @@ input {
   font-size: 16px;
 }
 
+
 input:focus {
   border-color: #007BFF;
   outline: none;
@@ -61,4 +62,26 @@ input:focus {
 .success {
   color: green;
   text-align: center;
+}
+
+.button-pass{
+  padding: 10px;
+  background-color: #9c9c9c;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.otp-verification{
+  max-width: 400px;
+  margin: auto;
+  margin-top: 150px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

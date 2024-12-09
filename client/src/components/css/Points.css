@@ -1,19 +1,64 @@
+/* ตั้งค่าพื้นฐาน */
 .points-container {
-    text-align: center;
-    margin-top: 150px;
-  }
-  
-  .points-box {
-    display: inline-block;
-    padding: 20px;
-    border: 2px solid #4caf50;
-    border-radius: 10px;
-    background-color: #f0f8f0;
-  }
-  
-  .points-box p {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-  }
-  
+  max-width: 400px;
+  margin: 50px auto;
+  margin-top: 150px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.points-header {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.points-box {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.points-total {
+  font-size: 35px;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.redeem-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.redeem-button.active {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.redeem-button.active:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.redeem-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+}

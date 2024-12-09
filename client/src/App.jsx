@@ -34,7 +34,6 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-
           <Route path="/booking"
             element={
               <PrivateRoute>

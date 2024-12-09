@@ -11,6 +11,7 @@ const axios = require("axios");
 const dayjs = require("dayjs");
 const isBetween = require('dayjs/plugin/isBetween');
 const verifyAdmin = require('./middlewares/verifyAdmin');
+const nodemailer = require('nodemailer');
 dayjs.extend(isBetween);
 
 const JWT_SECRET = 'hellohackerman';
@@ -26,6 +27,29 @@ db.connect((err) => {
   if (err) throw err;
   console.log('Connected to MySQL');
 });
+
+const sendOTP = async (email, otp) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'cpearena@gmail.com',
+      pass: 'ceem yoyn ilrp qsik', // ใช้ App Password
+    },
+  });
+
+  try {
+    await transporter.sendMail({
+      from: '"CPE Arena" <cpearena@gmail.com>',
+      to: email,
+      subject: 'OTP ยืนยันตัวตน',
+      text: `รหัส OTP ของคุณคือ ${otp} จะหมดอายุใน 10 นาที`,
+    });
+    console.log('ส่ง OTP สำเร็จ');
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการส่ง OTP:', error.message);
+    throw error;
+  }
+};
 
 app.post('/api/bookings', (req, res) => {
   const { id, field, date, startTime, endTime, timeUsed } = req.body;
@@ -80,39 +104,78 @@ app.get('/api/bookings', (req, res) => {
   });
 });
 
+// เส้นทางลงทะเบียน
 app.post('/api/member/register', (req, res) => {
-  const { name, phone, password } = req.body;
-  console.log('Request body:', req.body);
+  const { name, phone, email, password } = req.body;
 
-  if (!name || !phone || !password) {
+  if (!name || !phone || !email || !password) {
     return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
   }
 
-  const checkQuery = 'SELECT * FROM users WHERE phone = ?';
-  db.query(checkQuery, [phone], (err, existingUser) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเช็คเบอร์โทร' });
+  const checkQuery = 'SELECT * FROM users WHERE phone = ? OR email = ?';
+  db.query(checkQuery, [phone, email], (err, results) => {
+    if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'เบอร์โทรหรืออีเมลถูกใช้แล้ว' });
     }
 
-    if (existingUser.length > 0) {
-      return res.status(409).json({ message: 'เบอร์โทรนี้ถูกใช้ไปแล้ว' });
-    }
+    const otp = Math.floor(100000 + Math.random() * 900000); // สุ่ม OTP 6 หลัก
+    const otpExpiry = new Date(Date.now() + 10 * 60000); // OTP หมดอายุใน 10 นาที
 
     bcrypt.hash(password, 10, (err, hash) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน' });
-      }
+      if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเข้ารหัสรหัสผ่าน' });
 
-      const insertQuery = 'INSERT INTO users (name, phone, password) VALUES (?, ?, ?)';
-      db.query(insertQuery, [name, phone, hash], (err, result) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลงทะเบียน' });
+      const insertQuery = `
+        INSERT INTO users (name, phone, email, password, otp, otp_expiry, is_verified) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      db.query(insertQuery, [name, phone, email, hash, otp, otpExpiry, false], async (err) => {
+        if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลงทะเบียน' });
+
+        try {
+          await sendOTP(email, otp);
+          res.status(201).json({ message: 'กรุณายืนยัน OTP ในอีเมลของคุณ' });
+        } catch (emailError) {
+          res.status(500).json({ message: 'ไม่สามารถส่ง OTP ได้', error: emailError.message });
         }
-        return res.status(201).json({ message: 'ลงทะเบียนสำเร็จ', userId: result.insertId });
       });
+    });
+  });
+});
+
+app.post('/api/member/verify-otp', (req, res) => {
+  const { otpData } = req.body;
+  if (!otpData) {
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+  const { phone, otp } = otpData;
+  if (!phone || !otp) {
+    console.log('Phone:', phone, 'OTP:', otp);
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+
+  const query = 'SELECT * FROM users WHERE phone = ? AND otp = ?';
+  db.query(query, [phone, otp], (err, results) => {
+    if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+
+    if (results.length === 0) {
+      return res.status(400).json({ message: 'OTP ไม่ถูกต้องหรือหมดอายุ' });
+    }
+
+    const user = results[0];
+    if (new Date() > new Date(user.otp_expiry)) {
+      return res.status(400).json({ message: 'OTP หมดอายุ' });
+    }
+
+    const updateQuery = `
+      UPDATE users 
+      SET is_verified = TRUE, otp = NULL, otp_expiry = NULL 
+      WHERE phone = ?
+    `;
+    db.query(updateQuery, [phone], (err) => {
+      if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการยืนยัน' });
+      res.status(200).json({ message: 'ยืนยันตัวตนสำเร็จ' });
     });
   });
 });
@@ -310,7 +373,7 @@ app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
 
   const query = 'SELECT * FROM admins WHERE username = ?';
-  db.query(query,[username], (err, result) => {
+  db.query(query, [username], (err, result) => {
     if (result.length === 0) {
       return res.status(404).json({ message: 'Admin ไม่พบ' });
     }
