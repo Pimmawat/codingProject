@@ -145,13 +145,10 @@ app.post('/api/member/register', (req, res) => {
 });
 
 app.post('/api/member/verify-otp', (req, res) => {
-  const { otpData } = req.body;
-  if (!otpData) {
-    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
-  }
-  const { phone, otp } = otpData;
+  const { phone, otp } = req.body;
+  console.log('Received data:', req.body);
+
   if (!phone || !otp) {
-    console.log('Phone:', phone, 'OTP:', otp);
     return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
   }
 
@@ -164,21 +161,60 @@ app.post('/api/member/verify-otp', (req, res) => {
     }
 
     const user = results[0];
-    if (new Date() > new Date(user.otp_expiry)) {
-      return res.status(400).json({ message: 'OTP หมดอายุ' });
+    const currentTime = new Date();
+    const otpExpiry = new Date(user.otp_expiry);
+    if (currentTime > otpExpiry) {
+      const deleteQuery = 'DELETE FROM users WHERE phone = ?';
+      db.query(deleteQuery, [phone], (err) => {
+        if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
+        return res.status(400).json({ message: 'OTP หมดอายุ และข้อมูลถูกลบแล้ว' });
+      });
+    } else {
+      const updateQuery = `
+        UPDATE users 
+        SET is_verified = TRUE, otp = NULL, otp_expiry = NULL 
+        WHERE phone = ?
+      `;
+      db.query(updateQuery, [phone], (err) => {
+        if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการยืนยัน' });
+        res.status(200).json({ message: 'ยืนยันตัวตนสำเร็จ' });
+      });
     }
-
-    const updateQuery = `
-      UPDATE users 
-      SET is_verified = TRUE, otp = NULL, otp_expiry = NULL 
-      WHERE phone = ?
-    `;
-    db.query(updateQuery, [phone], (err) => {
-      if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการยืนยัน' });
-      res.status(200).json({ message: 'ยืนยันตัวตนสำเร็จ' });
-    });
   });
 });
+
+app.post('/api/member/check-otp-expiry', (req, res) => {
+  const { phone } = req.body;
+
+  if (!phone) {
+    return res.status(400).json({ message: 'กรุณากรอกเบอร์โทร' });
+  }
+
+  const query = 'SELECT otp, otp_expiry FROM users WHERE phone = ?';
+  db.query(query, [phone], (err, results) => {
+    if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+
+    if (results.length === 0) {
+      return res.status(400).json({ message: 'ไม่พบข้อมูลของผู้ใช้นี้' });
+    }
+
+    const user = results[0];
+    const currentTime = new Date();
+    const otpExpiry = new Date(user.otp_expiry);
+
+    if (currentTime > otpExpiry) {
+      const deleteQuery = 'DELETE FROM users WHERE phone = ?';
+      db.query(deleteQuery, [phone], (err) => {
+        if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
+
+        return res.status(400).json({ message: 'OTP หมดอายุและข้อมูลถูกลบแล้ว' });
+      });
+    } else {
+      return res.status(200).json({ message: 'OTP ยังไม่หมดอายุ' });
+    }
+  });
+});
+
 
 app.post('/api/member/login', (req, res) => {
   const { phone, password } = req.body;
@@ -391,7 +427,6 @@ app.post('/api/admin/login', (req, res) => {
     });
   });
 });
-
 
 app.get('/admin/dashboard', verifyAdmin, (req, res) => {
   res.json({ message: 'ยินดีต้อนรับสู่ Admin Dashboard' });

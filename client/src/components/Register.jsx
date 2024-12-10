@@ -51,8 +51,7 @@ const Register = () => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          setOtpData((prev) => ({ ...prev, phone: form.phone }));
-          setIsOTPStage(true);
+          navigate('/register/otpVerify', { state: { phone: form.phone } });
         });
         setForm({ name: '', email: '', phone: '', password: '' });
       } else {
@@ -69,49 +68,6 @@ const Register = () => {
       Swal.fire({
         title: 'เกิดข้อผิดพลาด!',
         text: 'เกิดข้อผิดพลาดในการลงทะเบียน',
-        icon: 'error',
-        confirmButtonText: 'ตกลง',
-      });
-    }
-  };
-
-  const handleVerifyOTP = async (e) => {
-    e.preventDefault();
-
-    console.log('Payload:', otpData);
-    try {
-      const response = await fetch('http://localhost:3001/api/member/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ otpData }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Swal.fire({
-          title: 'ยืนยันสำเร็จ!',
-          text: data.message,
-          icon: 'success',
-          confirmButtonText: 'ตกลง',
-        }).then(() => {
-          navigate('/login')
-        });
-      } else {
-        Swal.fire({
-          title: 'ข้อผิดพลาด!',
-          text: data.message,
-          icon: 'error',
-          confirmButtonText: 'ตกลง',
-        }).then(() => {
-          navigate('/login');
-      })};
-    } catch (error) {
-      Swal.fire({
-        title: 'เกิดข้อผิดพลาด!',
-        text: 'เกิดข้อผิดพลาดในการยืนยัน OTP',
         icon: 'error',
         confirmButtonText: 'ตกลง',
       });

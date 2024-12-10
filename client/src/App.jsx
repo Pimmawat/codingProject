@@ -11,6 +11,7 @@ import Payment from './components/Payment';
 import Ticket from './components/Ticket';
 import NotFound from './components/404notfound';
 import Points from './components/Points';
+import OtpVerify from './components/OtpVerify';
 //admin
 import AdminLogin from './components/AdminLogin';
 
@@ -32,6 +33,7 @@ const App = () => {
           <Route path='*' element = {<NotFound />} />
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/register/otpVerify" element={<OtpVerify />} />
           <Route path="/login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/booking"
