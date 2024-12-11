@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,10 +8,22 @@ import './css/Navbar.css';
 import { useUser } from './userContext';
 
 function Navbar1() {
+  const [admin, setAdmin] = useState(null);
   const { user, logout } = useUser();
   const navigate = useNavigate();
 
+  // ดึงข้อมูลจาก localStorage เมื่อ component โหลด
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('adminData')) || null;
+    if (userData) {
+      setAdmin(userData);  // อัพเดตสถานะ admin
+    }
+  }, []);
+
   const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminData');
+    setAdmin(null);  // อัพเดตสถานะ admin
     logout();
     navigate('/login');
   };
@@ -40,13 +52,16 @@ function Navbar1() {
                 {user.name}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                {user.role === 'admin' ? (
+                {/* ตรวจสอบ role ของ admin */}
+                {admin && admin.role === 'admin' ? (
                   <>
                     <Dropdown.Item as={Link} to="/admin/dashboard">แดชบอร์ด Admin</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/admin/users">จัดการผู้ใช้</Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/admin/settings">การตั้งค่า</Dropdown.Item>
                   </>
                 ) : (
                   <>
+                    <Dropdown.Item as={Link} to="/profile">แก้ไขโปรไฟล์</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/ticket">ประวัติของฉัน</Dropdown.Item>
                     <Dropdown.Item as={Link} to="/points">แต้มของฉัน</Dropdown.Item>

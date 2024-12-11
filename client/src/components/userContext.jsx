@@ -18,14 +18,14 @@ export const UserProvider = ({ children }) => {
   }, [user]);
 
   const logout = () => {
-    setUser(null);
+    setUser(null); // ลบ user จาก state
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, logout }}> {/* ส่งออก logout ด้วย */}
       {children}
     </UserContext.Provider>
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useUser = () => useContext(UserContext); // hook สำหรับใช้งาน user context

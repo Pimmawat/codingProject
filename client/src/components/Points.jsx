@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useUser } from './userContext';
-import './css/Points.css'; // ใส่ไฟล์ CSS เพื่อเพิ่มสไตล์
+import './css/Points.css';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Points = () => {
   const { user } = useUser();
@@ -30,10 +31,14 @@ const Points = () => {
 
   const handleRedeemPoints = () => {
     if (totalPoints >= 100) {
-      alert('คุณได้แลกแต้มสำเร็จ! นำไปใช้สำหรับการจองสนามฟรี');
-      navigate('/booking');
+      navigate('/redeem/booking', { state: { totalPoints } });
     } else {
-      alert('แต้มของคุณไม่เพียงพอสำหรับการแลก');
+      Swal.fire({
+        title: 'แลกแต้มไม่ได้!',
+        text: 'แต้มของท่านไม่เพียงพอ',
+        icon: 'warning',
+        confirmButtonText: 'ตกลง',
+      });
     }
   };
 
@@ -50,15 +55,13 @@ const Points = () => {
         </p>
       </div>
       <button
-        className={`redeem-button ${totalPoints >= 150 ? 'active' : 'disabled'}`}
+        className={`redeem-button ${totalPoints >= 100 ? 'active' : 'disabled'}`}
         onClick={handleRedeemPoints}
-        disabled={totalPoints < 150}
       >
-        {totalPoints >= 150 ? 'แลกแต้มเพื่อจองสนามฟรี' : 'แต้มไม่เพียงพอ'}
+        {totalPoints >= 100 ? 'แลกแต้มเพื่อจองสนามฟรี' : 'แต้มไม่เพียงพอ'}
       </button>
     </div>
   );
 };
 
 export default Points;
-

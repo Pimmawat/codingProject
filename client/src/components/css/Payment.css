@@ -97,3 +97,18 @@ tr:nth-child(odd) {
     margin-top: 30px;
     margin-bottom: 30px;
 }
+
+.points-box {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.points-total {
+    font-size: 35px;
+    color: #007bff;
+    font-weight: bold;
+    justify-self: center;
+}

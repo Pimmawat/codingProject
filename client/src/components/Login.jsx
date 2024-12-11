@@ -6,7 +6,7 @@ import { useUser } from './userContext';
 
 const Login = ({ handleLoginSuccess }) => {
   const { user, setUser } = useUser();
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
@@ -18,8 +18,8 @@ const Login = ({ handleLoginSuccess }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'phone') {
-      setPhone(value);
+    if (name === 'email') {
+      setEmail(value);
     } else if (name === 'password') {
       setPassword(value);
     }
@@ -34,7 +34,7 @@ const Login = ({ handleLoginSuccess }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -42,7 +42,7 @@ const Login = ({ handleLoginSuccess }) => {
         setUser({
           id: data.id,
           name: data.name,
-          phone: data.phone,
+          email: data.email,
           point: data.point,
         });
         localStorage.setItem('token', data.token);
@@ -80,12 +80,12 @@ const Login = ({ handleLoginSuccess }) => {
         <h2>เข้าสู่ระบบ</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="phone">เบอร์โทร:</label>
+            <label htmlFor="email">อีเมลล์:</label>
             <input
-              type="text"
-              id="phone"
-              name="phone"
-              value={phone}
+              type="email"
+              id="email"
+              name="email"
+              value={email}
               onChange={handleChange}
               required
             />
@@ -103,9 +103,9 @@ const Login = ({ handleLoginSuccess }) => {
           </div>
           <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
         </form>
-      </div>
-      <div className="admin-button" >
-        <a href="/admin/login">สำหรับแอดมิน</a>
+        <div className='admin-con'>
+          <a href="/admin/login">สำหรับแอดมิน</a>
+        </div>
       </div>
     </>
   );

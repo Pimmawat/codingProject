@@ -4,8 +4,9 @@ import Swal from 'sweetalert2';
 import { useUser } from './userContext';
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading';
+import { useLocation } from 'react-router-dom';
 
-const Booking = () => {
+const BookingFree = () => {
     const { user } = useUser();
     const [field, setField] = useState('');  // สำหรับการเลือกสนาม
     const [date, setDate] = useState('');
@@ -14,6 +15,8 @@ const Booking = () => {
     const [timeDiff, setTimeDiff] = useState(null);
     const [bookedTimes, setBookedTimes] = useState([]);
     const navigate = useNavigate(); 
+    const location = useLocation();
+    const totalPoints = location.state?.totalPoints || 0;
 
 
     useEffect(() => {
@@ -72,7 +75,6 @@ const Booking = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
         // ตรวจสอบว่าเวลาจองผ่านไปแล้วหรือไม่
         const currentDateTime = new Date();
         const startDateTime = new Date(`${date}T${startTime}`);
@@ -97,16 +99,18 @@ const Booking = () => {
             startTime,
             endTime,
             timeUsed: difference,
+            totalPoints
+            
         };
     
         Swal.fire({
             icon: 'success',
             title: 'การจองของคุณพร้อมแล้ว',
-            text: 'ระบบกำลังพาคุณไปยังหน้าชำระเงิน',
+            text: 'ระบบกำลังพาคุณไปยังหน้าแลกแต้ม',
         });
     
         // นำไปยังหน้าชำระเงินพร้อมข้อมูลการจอง
-        navigate('/booking/payment', { state: bookingData });
+        navigate('/redeem', { state: bookingData });
     };
 
     return (
@@ -178,4 +182,4 @@ const Booking = () => {
     );
 };
 
-export default Booking;
+export default BookingFree;

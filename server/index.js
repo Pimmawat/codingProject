@@ -42,7 +42,8 @@ const sendOTP = async (email, otp) => {
       from: '"CPE Arena" <cpearena@gmail.com>',
       to: email,
       subject: 'OTP ยืนยันตัวตน',
-      text: `รหัส OTP ของคุณคือ ${otp} จะหมดอายุใน 10 นาที`,
+      text: `ยินดีต้อนรับเข้าสู่ระบบจองสนาม CPE Arena \n
+      รหัส OTP ของคุณคือ ${otp} จะหมดอายุใน 10 นาที`,
     });
     console.log('ส่ง OTP สำเร็จ');
   } catch (error) {
@@ -87,6 +88,58 @@ app.post('/api/bookings', (req, res) => {
   });
 });
 
+app.post('/api/redeem/bookings', (req, res) => {
+  const { id, field, date, startTime, endTime, timeUsed } = req.body;
+
+  // ตรวจสอบว่าผู้ใช้งานมีแต้มเพียงพอหรือไม่
+  const checkPointsQuery = `SELECT SUM(points) AS totalPoints FROM points WHERE user_id = ?`;
+  db.query(checkPointsQuery, [id], (err, results) => {
+    if (err) return res.status(500).send(err);
+
+    const totalPoints = results[0]?.totalPoints || 0; // ถ้าไม่มีข้อมูล กำหนดให้เป็น 0
+    const requiredPoints = timeUsed * 100; // แต้มที่ต้องใช้
+
+    if (totalPoints < requiredPoints) {
+      return res.status(400).send({
+        message: `แต้มของคุณไม่เพียงพอ (${totalPoints} แต้ม) ต้องการ ${requiredPoints} แต้ม`
+      });
+    }
+    // ตรวจสอบว่ามีการจองในเวลานี้หรือไม่
+    const checkQuery = `
+      SELECT * FROM reserve 
+      WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
+    `;
+    db.query(checkQuery, [field, date, endTime, startTime], (err, results) => {
+      if (err) return res.status(500).send(err);
+      if (results.length > 0) {
+        return res.status(400).send({ message: 'เวลานี้ถูกจองแล้ว' });
+      }
+
+      // เพิ่มข้อมูลการจอง
+      const query = `
+        INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed) 
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      db.query(query, [id, field, date, startTime, endTime, timeUsed], (err, result) => {
+        if (err) return res.status(500).send(err);
+        // หักแต้มจากผู้ใช้งาน
+        const points = timeUsed * -100;
+        const pointsQuery = `
+          INSERT INTO points (user_id, booking_id, points) 
+          VALUES (?, ?, ?) 
+        `;
+        db.query(pointsQuery, [id, result.insertId, points], (err) => {
+          if (err) return res.status(500).send(err);
+          res.status(201).send({
+            message: 'จองสำเร็จ',
+            bookingId: result.insertId
+          });
+        });
+      });
+    });
+  });
+});
+
 app.get('/api/bookings', (req, res) => {
   const sql = 'SELECT * FROM reserve';
 
@@ -104,7 +157,6 @@ app.get('/api/bookings', (req, res) => {
   });
 });
 
-// เส้นทางลงทะเบียน
 app.post('/api/member/register', (req, res) => {
   const { name, phone, email, password } = req.body;
 
@@ -157,7 +209,7 @@ app.post('/api/member/verify-otp', (req, res) => {
     if (err) return res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
 
     if (results.length === 0) {
-      return res.status(400).json({ message: 'OTP ไม่ถูกต้องหรือหมดอายุ' });
+      return res.status(400).json({ message: 'OTP ไม่ถูกต้อง' });
     }
 
     const user = results[0];
@@ -215,17 +267,16 @@ app.post('/api/member/check-otp-expiry', (req, res) => {
   });
 });
 
-
 app.post('/api/member/login', (req, res) => {
-  const { phone, password } = req.body;
+  const { email, password } = req.body;
 
-  const query = 'SELECT * FROM users WHERE phone = ?';
-  db.query(query, [phone], (err, result) => {
+  const query = 'SELECT * FROM users WHERE email = ?';
+  db.query(query, [email], (err, result) => {
     if (err) {
       return res.status(500).json({ message: 'Server error' });
     }
     if (result.length === 0) {
-      return res.status(401).json({ message: 'Invalid phone or password' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
     // ตรวจรหัสผ่าน
     const user = result[0];
@@ -234,10 +285,10 @@ app.post('/api/member/login', (req, res) => {
         return res.status(500).json({ message: 'Server error' });
       }
       if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid phone or password' });
+        return res.status(401).json({ message: 'Invalid email or password' });
       }
       const token = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
-      return res.status(200).json({ message: 'Login successful', id: user.id, name: user.name, phone: user.phone, point: user.total_points, token });
+      return res.status(200).json({ message: 'Login successful', id: user.id, name: user.name, email: user.email, point: user.total_points, token });
     });
   });
 });
@@ -385,51 +436,124 @@ app.post("/api/verify-qrcode", async (req, res) => {
   }
 });
 
-app.get('/api/points', (req, res) => {
-  const { user_id } = req.query;
-  console.log('Received user_id:', user_id); // ตรวจสอบค่า user_id ใน console
+app.get('/api/profile:id', (req, res) => {
+  const sql = 'SELECT * FROM users WHERE id = ?';
+  const userId = req.params.id; // ดึง id จาก params
 
-  const query = `SELECT SUM(points) AS totalPoints FROM points WHERE user_id = ?`;
-
-  db.query(query, [user_id], (err, results) => {
+  db.query(sql, [userId], (err, results) => {
     if (err) {
-      console.error('Error fetching points:', err);
-      return res.status(500).send({ message: 'Server error' });
+      console.error('Error fetching profile:', err);
+      res.status(500).send('Error fetching profile');
+    } else {
+      if (results.length > 0) {
+        res.json(results[0]);
+      } else {
+        res.status(404).send('Profile not found');
+      }
     }
-
-    const totalPoints = results[0]?.totalPoints || 0; // ถ้าไม่มีแต้ม ให้แสดง 0
-    console.log(totalPoints);
-    res.status(200).send({ totalPoints });
   });
 });
 
-//Admin
-
-app.post('/api/admin/login', (req, res) => {
-  const { username, password } = req.body;
-
-  const query = 'SELECT * FROM admins WHERE username = ?';
-  db.query(query, [username], (err, result) => {
-    if (result.length === 0) {
-      return res.status(404).json({ message: 'Admin ไม่พบ' });
+app.put('/api/profile/:id', (req, res) => {
+  const { name, email, phone } = req.body;
+  const userId = req.params.id;
+  // ตรวจสอบว่ามีข้อมูลที่จำเป็นครบถ้วนหรือไม่
+  if (!name || !email || !phone) {
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+  // ตรวจสอบว่าเบอร์โทรที่กรอกมีอยู่ในระบบแล้วหรือไม่
+  const checkPhoneSql = 'SELECT * FROM users WHERE phone = ? AND id != ?';
+  db.query(checkPhoneSql, [phone, userId], (err, results) => {
+    if (err) {
+      console.error('Error checking phone:', err);
+      return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการตรวจสอบเบอร์โทร' });
     }
-    const admin = result[0];
-    // ตรวจสอบรหัสผ่าน
-    bcrypt.compare(password, admin.password, (err, isMatch) => {
+    // ถ้ามีเบอร์โทรซ้ำ ให้ส่งข้อผิดพลาด
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'เบอร์โทรนี้ถูกใช้งานแล้ว' });
+    }
+    // อัปเดตข้อมูลผู้ใช้
+    const sql = 'UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?';
+    db.query(sql, [name, email, phone, userId], (err, result) => {
       if (err) {
-        return res.status(500).json({ message: 'Server error' });
+        console.error('Error updating profile:', err);
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' });
       }
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid phone or password' });
-      }
-      const token = jwt.sign({ id: admin.id, role: admin.name }, JWT_SECRET, { expiresIn: '1h' });
-      return res.status(200).json({ message: 'Login successful', id: admin.id, name: admin.name, phone: admin.phone, point: admin.total_points, token });
+      res.json({ message: 'ข้อมูลอัปเดตสำเร็จ' });
     });
   });
 });
 
-app.get('/admin/dashboard', verifyAdmin, (req, res) => {
-  res.json({ message: 'ยินดีต้อนรับสู่ Admin Dashboard' });
+
+//Admin
+
+const verifyAdminToken = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ message: 'ไม่พบ Token หรือ Token หมดอายุ' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, 'your_jwt_secret');
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้' });
+    }
+    req.admin = decoded; // เก็บข้อมูลแอดมินใน request
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Token ไม่ถูกต้องหรือหมดอายุ' });
+  }
+};
+
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // ตรวจสอบว่ามีข้อมูลหรือไม่
+  if (!username || !password) {
+    return res.status(400).json({ message: 'กรุณากรอกอีเมลและรหัสผ่าน' });
+  }
+
+  // ค้นหาข้อมูลแอดมินในฐานข้อมูล
+  const sql = 'SELECT * FROM admins WHERE username = ?';
+  db.query(sql, [username], (err, results) => {
+    if (err) {
+      console.error('Error querying database:', err);
+      return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'อีเมลไม่ถูกต้อง' });
+    }
+
+    const admin = results[0];
+
+    // ตรวจสอบรหัสผ่านที่กรอกกับรหัสผ่านที่เก็บในฐานข้อมูล
+    bcrypt.compare(password, admin.password, (err, isMatch) => {
+      if (err) {
+        console.error('Error comparing password:', err);
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' });
+      }
+
+      if (!isMatch) {
+        return res.status(401).json({ message: 'รหัสผ่านไม่ถูกต้อง' });
+      }
+
+      // สร้าง JWT Token
+      const token = jwt.sign({ id: admin.id, role: 'admin' }, 'your_jwt_secret', { expiresIn: '1h' });
+
+      res.json({
+        message: 'เข้าสู่ระบบสำเร็จ',
+        token,
+        admin: {
+          id: admin.id,
+          name: admin.name,
+          username: admin.username,
+          role : admin.role,
+        },
+      });
+    });
+  });
 });
 
 app.listen(3001, () => {
