@@ -700,7 +700,7 @@ app.get('/api/admin/bookings', async (req, res) => {
 
 app.delete('/api/admin/bookings/:id', async (req, res) => {
   const { id } = req.params;
-  const sql = 'DELETE FROM reserve WHERE id = ?';
+  const sql = 'DELETE FROM reserve WHERE booking_id = ?';
 
   try {
     const [results] = await db.promise().query(sql, [id]);

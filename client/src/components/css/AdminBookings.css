@@ -1,0 +1,24 @@
+.MuiTableCell-body {
+    text-align: center;
+}
+
+.MuiTableRow-root:hover {
+    background-color: #f1f1f1 !important;
+}
+
+/* ปุ่ม */
+.MuiButton-root {
+    transition: all 0.3s ease-in-out;
+}
+
+.MuiButton-root:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ช่องค้นหา */
+.MuiTextField-root {
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

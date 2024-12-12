@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import {
     Container,
@@ -15,12 +16,15 @@ import {
     Box,
 } from "@mui/material";
 import Swal from "sweetalert2";
+import './css/AdminBookings.css';
+import Loading from "./Loading";
 
 const AdminBookings = () => {
     const [bookings, setBookings] = useState([]);
     const [admin, setAdmin] = useState();
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
 
     const getUserName = (userId) => {
         const user = users.find((u) => u.id === userId);
@@ -33,18 +37,21 @@ const AdminBookings = () => {
         if (savedAdmin) {
             setAdmin(savedAdmin);
         } else {
-            navigate('/');
+            <Loading />
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่มีToken โปรดลองอีกครั้ง',
+            }).then(() => navigate('/'));
         }
-        axios
-            .get("http://localhost:3001/api/admin/bookings")
+        axios.get("http://localhost:3001/api/admin/bookings")
             .then((response) => {
                 setBookings(response.data);
             })
             .catch((error) => {
                 console.error("Error fetching bookings:", error);
             });
-        axios
-            .get("http://localhost:3001/api/admin/users")
+        axios.get("http://localhost:3001/api/admin/users")
             .then((response) => {
                 setUsers(response.data);
             })
@@ -83,7 +90,7 @@ const AdminBookings = () => {
         (booking) =>
             (getUserName(booking.user_id) && getUserName(booking.user_id).toString().includes(searchQuery)) || // ค้นหาโดย user_id
             (booking.field && booking.field.toLowerCase().includes(searchQuery)) // ค้นหาโดย field
-            
+
     );
 
     // แปลงวันที่ให้อยู่ในรูปแบบที่อ่านง่าย
@@ -93,12 +100,19 @@ const AdminBookings = () => {
             month: "long",
             day: "numeric",
             hour: "numeric",
-            minute: "numeric",
+            minute: "numeric"
+        });
+    };
+    const formatDateNoTime = (date) => {
+        return new Date(date).toLocaleString("th-TH", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
         });
     };
 
     return (
-        <Container sx={{ marginTop: 4 }}>
+        <Container sx={{ marginTop: 20 }}>
             <Box sx={{ textAlign: "center", marginBottom: 2 }}>
                 <Typography variant="h4" gutterBottom>
                     จัดการการจองสนาม
@@ -110,14 +124,22 @@ const AdminBookings = () => {
 
             <Box sx={{ mb: 3 }}>
                 <TextField
-                    placeholder="ค้นหาผู้ใช้งาน"
+                    placeholder="ค้นหา"
                     variant="outlined"
                     fullWidth
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    sx={{
+                        boxShadow: 3,
+                        borderRadius: "8px",
+                    }}
                 />
             </Box>
 
-            <TableContainer component={Paper} sx={{ borderRadius: "20px", boxShadow: 3 }}>
+
+            <TableContainer component={Paper} sx={{
+                borderRadius: "20px", boxShadow: 3, overflow: "hidden",
+                marginTop: 2,
+            }}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -125,7 +147,7 @@ const AdminBookings = () => {
                                 รหัสการจอง
                             </TableCell>
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                ผู้ใช้ (User ID)
+                                ผู้ใช้
                             </TableCell>
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
                                 สนาม
@@ -143,7 +165,7 @@ const AdminBookings = () => {
                                 เวลาที่ใช้ (ชั่วโมง)
                             </TableCell>
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                สร้างเมื่อ
+                                จองเมื่อ
                             </TableCell>
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
                                 จัดการ
@@ -156,7 +178,7 @@ const AdminBookings = () => {
                                 <TableCell align="center">{booking.booking_id}</TableCell>
                                 <TableCell align="center">{getUserName(booking.user_id)}</TableCell>
                                 <TableCell align="center">{booking.field}</TableCell>
-                                <TableCell align="center">{formatDate(booking.date)}</TableCell>
+                                <TableCell align="center">{formatDateNoTime(booking.date)}</TableCell>
                                 <TableCell align="center">{booking.startTime}</TableCell>
                                 <TableCell align="center">{booking.endTime}</TableCell>
                                 <TableCell align="center">{booking.timeUsed}</TableCell>

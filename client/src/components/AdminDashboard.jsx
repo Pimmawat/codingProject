@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Typography, Card, CardContent, Box } from '@mui/material';
 import './css/AdminDashboard.css';
+import Swal from "sweetalert2";
+import Loading from "./Loading";
+
 
 const AdminDashboard = () => {
   const [admin, setAdmin] = useState(null);
@@ -16,7 +19,12 @@ const AdminDashboard = () => {
     if (savedAdmin) {
       setAdmin(savedAdmin);
     } else {
-      navigate('/');
+      <Loading />
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่มีToken โปรดลองอีกครั้ง',
+      }).then(() => navigate('/'));
     }
 
     // ดึงข้อมูลจำนวนผู้ใช้งาน
@@ -50,11 +58,11 @@ const AdminDashboard = () => {
           <Typography variant="h5" gutterBottom>ข้อมูลสรุป</Typography>
 
           {/* ใช้ Box แทน Grid */}
-          <Box 
-            display="flex" 
-            justifyContent="space-between" 
-            flexWrap="wrap" 
-            gap={3} 
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            flexWrap="wrap"
+            gap={3}
             marginTop={2}
           >
             <Card sx={{ minHeight: 200, backgroundColor: '#1976d2', color: 'white', flex: '1 1 calc(33% - 1rem)' }}>
