@@ -10,7 +10,6 @@ const FormData = require('form-data');
 const axios = require("axios");
 const dayjs = require("dayjs");
 const isBetween = require('dayjs/plugin/isBetween');
-const verifyAdmin = require('./middlewares/verifyAdmin');
 const nodemailer = require('nodemailer');
 dayjs.extend(isBetween);
 
@@ -50,6 +49,31 @@ const sendOTP = async (email, otp) => {
     console.error('เกิดข้อผิดพลาดในการส่ง OTP:', error.message);
     throw error;
   }
+};
+
+const sendResetEmail = (email, resetLink) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'cpearena@gmail.com',
+      pass: 'ceem yoyn ilrp qsik',
+    },
+  });
+
+  const mailOptions = {
+    from: 'cpearena@gmail.com',
+    to: email,
+    subject: 'รีเซ็ตรหัสผ่านของคุณ',
+    html: `<p>กรุณาคลิกที่ลิงก์ด้านล่างเพื่อรีเซ็ตรหัสผ่านของคุณ:</p><p><a href="${resetLink}">${resetLink}</a></p>`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
 };
 
 app.post('/api/bookings', (req, res) => {
@@ -484,27 +508,85 @@ app.put('/api/profile/:id', (req, res) => {
   });
 });
 
+app.post('/api/auth/forgetpassword', (req, res) => {
+  const { email } = req.body;
 
-//Admin
-
-const verifyAdminToken = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).json({ message: 'ไม่พบ Token หรือ Token หมดอายุ' });
+  if (!email) {
+    return res.status(400).json({ message: 'กรุณาใส่อีเมล' });
   }
 
-  try {
-    const decoded = jwt.verify(token, 'your_jwt_secret');
-    if (decoded.role !== 'admin') {
-      return res.status(403).json({ message: 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้' });
+  const query = 'SELECT * FROM users WHERE email = ?';
+  db.query(query, [email], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
     }
-    req.admin = decoded; // เก็บข้อมูลแอดมินใน request
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Token ไม่ถูกต้องหรือหมดอายุ' });
+
+    if (results.length === 0) {
+      return res.status(400).json({ message: 'ไม่พบอีเมลนี้ในระบบ' });
+    }
+
+    // สร้างโทเค็นสำหรับรีเซ็ตรหัสผ่าน
+    const user = results[0];
+    const token = jwt.sign({ email: user.email }, 'hellohackerman', { expiresIn: '1h' });
+    const resetLink = `http://localhost:5173/resetpassword/${token}`;
+
+    // ส่งอีเมล
+    sendResetEmail(user.email, resetLink);
+
+    res.json({ message: 'ลิงก์รีเซ็ตรหัสผ่านได้ถูกส่งไปยังอีเมลของคุณแล้ว' });
+  });
+});
+
+app.post('/api/auth/resetpassword', (req, res) => {
+  const { password, resetToken } = req.body;
+
+  // ตรวจสอบว่ามี token หรือไม่
+  if (!resetToken || !password) {
+    return res.status(400).json({ message: 'ข้อมูลไม่ครบถ้วน' });
   }
-};
+
+  // ตรวจสอบว่า token ถูกต้องและดึงข้อมูลจาก token
+  jwt.verify(resetToken, 'hellohackerman', (err, decoded) => {
+    if (err) {
+      return res.status(400).json({ message: 'ลิงก์รีเซ็ทหมดอายุหรือไม่ถูกต้อง' });
+    }
+
+    // ดึงอีเมลจาก token
+    const email = decoded.email;
+
+    const checkQuery = 'SELECT * FROM used_tokens WHERE token = ?';
+    db.query(checkQuery, [resetToken], (err, results) => {
+      if (err) {
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการตรวจสอบ token' });
+      }
+
+      if (results.length > 0) {
+        return res.status(400).json({ message: 'ลิงก์นี้ถูกใช้ไปแล้ว' });
+      }
+      // เข้ารหัสรหัสผ่านใหม่
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
+      // อัปเดตข้อมูลรหัสผ่านในฐานข้อมูล
+      const query = 'UPDATE users SET password = ? WHERE email = ?';
+      db.query(query, [hashedPassword, email], (err, result) => {
+        if (err) {
+          return res.status(500).json({ message: 'ไม่สามารถอัปเดตข้อมูลได้' });
+        }
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการรีเซ็ตรหัสผ่าน' });
+        }
+        const insertQuery = 'INSERT INTO used_tokens (token) VALUES (?)';
+        db.query(insertQuery, [resetToken], (err, insertResult) => {
+          if (err) {
+            return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการบันทึก token' });
+          }
+          res.status(200).json({ message: 'รีเซ็ตรหัสผ่านสำเร็จ' });
+        });
+      });
+    });
+  });
+});
+//Admin
 
 app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
@@ -540,7 +622,7 @@ app.post('/api/admin/login', (req, res) => {
       }
 
       // สร้าง JWT Token
-      const token = jwt.sign({ id: admin.id, role: 'admin' }, 'your_jwt_secret', { expiresIn: '1h' });
+      const token = jwt.sign({ id: admin.id, role: 'admin' }, 'gupenadmin', { expiresIn: '1h' });
 
       res.json({
         message: 'เข้าสู่ระบบสำเร็จ',
@@ -549,11 +631,88 @@ app.post('/api/admin/login', (req, res) => {
           id: admin.id,
           name: admin.name,
           username: admin.username,
-          role : admin.role,
+          role: admin.role,
         },
       });
     });
   });
+});
+
+app.get('/api/users/count', (req, res) => {
+  db.query('SELECT COUNT(*) AS count FROM users', (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    res.json({ count: results[0].count });
+  });
+});
+
+app.get('/api/reserves/count', (req, res) => {
+  db.query('SELECT COUNT(*) AS count FROM reserve', (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    res.json({ count: results[0].count });
+  });
+});
+
+app.get('/api/admin/users', (req, res) => {
+  const sql = 'SELECT * FROM users';
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching users:', err);
+      res.status(500).send('Error fetching users');
+    } else {
+      if (Array.isArray(results)) {
+        res.json(results);
+      } else {
+        res.json([]);
+      }
+    }
+  });
+});
+
+app.delete('/api/admin/users/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const sql = 'DELETE FROM users WHERE id = ?';
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error('Error to delete users:', err);
+      return res.status(500).send('Error delete users'); // ถ้ามีข้อผิดพลาด ส่งคำตอบก่อน
+    }
+    return res.status(200).send('User deleted successfully');
+  });
+});
+
+app.get('/api/admin/bookings', async (req, res) => {
+  const sql = 'SELECT * FROM reserve ORDER BY date DESC';
+
+  try {
+    const [results] = await db.promise().query(sql);
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Error fetching bookings:', err);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูลการจอง' });
+  }
+});
+
+app.delete('/api/admin/bookings/:id', async (req, res) => {
+  const { id } = req.params;
+  const sql = 'DELETE FROM reserve WHERE id = ?';
+
+  try {
+    const [results] = await db.promise().query(sql, [id]);
+    if (results.affectedRows === 0) {
+      res.status(404).json({ error: 'ไม่พบข้อมูลการจองที่ต้องการลบ' });
+    } else {
+      res.status(200).json({ message: 'ลบข้อมูลการจองสำเร็จ' });
+    }
+  } catch (err) {
+    console.error('Error deleting booking:', err);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบข้อมูลการจอง' });
+  }
 });
 
 app.listen(3001, () => {

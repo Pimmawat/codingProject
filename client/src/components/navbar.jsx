@@ -6,6 +6,7 @@ import Nav from 'react-bootstrap/Nav';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './css/Navbar.css';
 import { useUser } from './userContext';
+import { useAdmin } from './adminContext';
 
 function Navbar1() {
   const [admin, setAdmin] = useState(null);
@@ -18,7 +19,7 @@ function Navbar1() {
     if (userData) {
       setAdmin(userData);  // อัพเดตสถานะ admin
     }
-  }, []);
+  }, [setAdmin]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -52,21 +53,36 @@ function Navbar1() {
                 {user.name}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                {/* ตรวจสอบ role ของ admin */}
-                {admin && admin.role === 'admin' ? (
-                  <>
-                    <Dropdown.Item as={Link} to="/admin/dashboard">แดชบอร์ด Admin</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/admin/users">จัดการผู้ใช้</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/admin/settings">การตั้งค่า</Dropdown.Item>
-                  </>
-                ) : (
-                  <>
-                    <Dropdown.Item as={Link} to="/profile">แก้ไขโปรไฟล์</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/ticket">ประวัติของฉัน</Dropdown.Item>
-                    <Dropdown.Item as={Link} to="/points">แต้มของฉัน</Dropdown.Item>
-                  </>
-                )}
+                <>
+                  <Dropdown.Item as={Link} to="/profile">แก้ไขโปรไฟล์</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/booking">จองสนาม</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/ticket">ประวัติของฉัน</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/points">แต้มของฉัน</Dropdown.Item>
+                </>
+                <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          ) : admin ? (
+            <Dropdown align="end">
+              <Dropdown.Toggle
+                variant="outline-primary"
+                id="dropdown-admin"
+                className="d-flex align-items-center"
+              >
+                <img
+                  src="/profile-placeholder.png"
+                  alt="Profile"
+                  className="rounded-circle me-2"
+                  style={{ width: '30px', height: '30px' }}
+                />
+                แอดมิน
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <>
+                  <Dropdown.Item as={Link} to="/admin/dashboard">แดชบอร์ด</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/admin/users">จัดการผู้ใช้งาน</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/admin/bookings">จัดการการจองสนาม</Dropdown.Item>
+                </>
                 <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

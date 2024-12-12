@@ -137,7 +137,7 @@ const Profile = () => {
                             readOnly
                         />
                     </div>
-                    <a href="/fotgetpassword">ลืมรหัสผ่าน</a>
+                    <a href="/forgetpassword">ลืมรหัสผ่าน</a>
                         <button type="submit">บันทึก</button>
                 </form>
             )}

@@ -2,9 +2,9 @@ const mysql = require('mysql2');
 
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root', // ใส่ username ของ MySQL
-    password: '', // ใส่ password ของ MySQL
-    database: 'footballdb1', // ฐานข้อมูลที่ใช้
+    user: 'root', 
+    password: '', 
+    database: 'footballdb1', 
   });
 
 module.exports = db;

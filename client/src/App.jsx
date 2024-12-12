@@ -15,82 +15,123 @@ import OtpVerify from './components/OtpVerify';
 import BookingFree from './components/BookingFree';
 import Redeem from './components/Redeem';
 import Profile from './components/Profile';
-//admin
+import ForgetPassword from './components/ForgetPassword';
+import ResetPassword from './components/ResetPassword';
+// admin
 import AdminLogin from './components/AdminLogin';
+import AdminDashboard from './components/AdminDashboard';
+import AdminUsers from './components/AdminUsers';
+import AdminBookings from './components/AdminBookings';
 
 const App = () => {
-
-  const [user, setUser] = useState(null); 
-  const [phone,setPhone] = useState(null);
+  const [user, setUser] = useState(null);
+  const [phone, setPhone] = useState(null);
 
   const handleLoginSuccess = (name) => {
-    setUser({ name }); 
-    setPhone({phone});
-  }
+    setUser({ name });
+    setPhone({ phone });
+  };
 
   return (
-    <UserProvider value={{ user, setUser }}>
-      <Router>
-        <Navbar1 />
-        <Routes>
-          <Route path='*' element = {<NotFound />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/register/otpVerify" element={<OtpVerify />} />
-          <Route path="/login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/booking"
-            element={
-              <PrivateRoute>
-                <Booking />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/booking/payment" 
-          element={
-          <PrivateRoute>
-            <Payment/>
-          </PrivateRoute>
-          }
-          />
-          <Route path="/ticket"
-            element={
-              <PrivateRoute>
-                <Ticket />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/points"
-            element={
-              <PrivateRoute>
-                <Points />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/redeem/booking"
-            element={
-              <PrivateRoute>
-                <BookingFree />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/redeem"
-            element={
-              <PrivateRoute>
-                <Redeem />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </UserProvider>
+    <> 
+      <UserProvider value={{ user, setUser }}>
+        <Router>
+          <Navbar1 />
+          <Routes>
+            <Route path="*" element={<NotFound />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/register/otpVerify" element={<OtpVerify />} />
+            <Route path="/login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+            {/* Private Routes */}
+            <Route
+              path="/forgetpassword"
+              element={
+                <PrivateRoute>
+                  <ForgetPassword />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/resetpassword/:token"
+              element={
+                <PrivateRoute>
+                  <ResetPassword />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile/forgetpassword"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/booking"
+              element={
+                <PrivateRoute>
+                  <Booking />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/booking/payment"
+              element={
+                <PrivateRoute>
+                  <Payment />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/ticket"
+              element={
+                <PrivateRoute>
+                  <Ticket />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/points"
+              element={
+                <PrivateRoute>
+                  <Points />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/redeem/booking"
+              element={
+                <PrivateRoute>
+                  <BookingFree />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/redeem"
+              element={
+                <PrivateRoute>
+                  <Redeem />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </UserProvider>
+    </>
   );
 };
 
