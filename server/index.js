@@ -18,7 +18,11 @@ const JWT_SECRET = 'hellohackerman';
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
 
-app.use(cors({origin: '*'}));
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -112,7 +116,7 @@ app.post('/api/bookings', (req, res) => {
   });
 });
 
-app.get('/', (req,res) => {
+app.get('/', (req, res) => {
   res.send("THis is API CpeArena");
 });
 
