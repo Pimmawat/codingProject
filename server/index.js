@@ -18,7 +18,7 @@ const JWT_SECRET = 'hellohackerman';
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
 
-app.use(cors());
+app.use(cors({origin: '*'}));
 app.use(bodyParser.json());
 app.use(express.json());
 
