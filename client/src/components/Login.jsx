@@ -3,6 +3,7 @@ import './css/Login.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from './userContext';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Login = ({ handleLoginSuccess }) => {
   const { user, setUser } = useUser();
@@ -29,7 +30,7 @@ const Login = ({ handleLoginSuccess }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/api/member/login', {
+      const response = await fetch(`${apiUrl}/api/member/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

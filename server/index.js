@@ -111,6 +111,9 @@ app.post('/api/bookings', (req, res) => {
     });
   });
 });
+app.get('/', (req,res) => {
+  res.send("THis is API CpeArena");
+});
 
 app.post('/api/redeem/bookings', (req, res) => {
   const { id, field, date, startTime, endTime, timeUsed } = req.body;

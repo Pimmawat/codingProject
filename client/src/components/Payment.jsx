@@ -4,6 +4,7 @@ import Loading from './Loading';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import './css/Payment.css';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 
 const Payment = () => {
@@ -37,7 +38,7 @@ const Payment = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3001/api/payment/generate-qrcode', {
+            const response = await fetch(`${apiUrl}/api/payment/generate-qrcode`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ const Payment = () => {
         formData.append('amount', amount);
 
         try {
-            const response = await fetch('http://localhost:3001/api/payment/upload-slip', {
+            const response = await fetch(`${apiUrl}/api/payment/upload-slip`, {
                 method: 'POST',
                 body: formData,
             });
@@ -148,7 +149,7 @@ const Payment = () => {
                 ...state
             };
 
-            const response = await fetch('http://localhost:3001/api/bookings', {
+            const response = await fetch(`${apiUrl}/api/bookings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

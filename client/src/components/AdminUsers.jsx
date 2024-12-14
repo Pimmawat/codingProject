@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'; // นำเข้า SweetAlert2
 import './css/AdminUsers.css';
 import Loading from './Loading';
 import { useNavigate } from 'react-router-dom';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
@@ -30,7 +31,7 @@ const AdminUsers = () => {
             }).then(() => navigate('/'));
         }
 
-        axios.get('http://localhost:3001/api/admin/users')
+        axios.get(`${apiUrl}/api/admin/users`)
             .then(response => {
                 setUsers(response.data);
                 setFilteredUsers(response.data);
@@ -53,7 +54,7 @@ const AdminUsers = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 // ลบผู้ใช้จากระบบ
-                axios.delete(`http://localhost:3001/api/admin/users/${id}`)
+                axios.delete(`${apiUrl}/api/admin/users/${id}`)
                     .then(() => {
                         setUsers(users.filter(user => user.id !== id));
                         Swal.fire(

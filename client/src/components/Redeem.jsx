@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import './css/Payment.css';
 import Loading from './Loading';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Redeem = () => {
   const location = useLocation();
@@ -38,7 +39,7 @@ const Redeem = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/redeem/bookings', {
+      const response = await fetch(`${apiUrl}/api/redeem/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(state),

@@ -5,6 +5,7 @@ import { Container, Typography, Card, CardContent, Box } from '@mui/material';
 import './css/AdminDashboard.css';
 import Swal from "sweetalert2";
 import Loading from "./Loading";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 
 const AdminDashboard = () => {
@@ -28,7 +29,7 @@ const AdminDashboard = () => {
     }
 
     // ดึงข้อมูลจำนวนผู้ใช้งาน
-    axios.get('http://localhost:3001/api/users/count')
+    axios.get(`${apiUrl}/api/users/count`)
       .then((response) => {
         setUserCount(response.data.count);
       })
@@ -37,7 +38,7 @@ const AdminDashboard = () => {
       });
 
     // ดึงข้อมูลจำนวนการจอง
-    axios.get('http://localhost:3001/api/reserves/count')
+    axios.get(`${apiUrl}/api/reserves/count`)
       .then((response) => {
         setReserveCount(response.data.count);
       })

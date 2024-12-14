@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import './css/ForgetPassword.css';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ const ForgotPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3001/api/auth/forgetpassword', {
+            const response = await fetch(`${apiUrl}/api/auth/forgetpassword`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import { useUser } from './userContext';
 import './css/Points.css';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Points = () => {
   const { user } = useUser();
@@ -13,7 +14,7 @@ const Points = () => {
   useEffect(() => {
     const fetchPoints = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/points?user_id=${user.id}`);
+        const response = await fetch(`${apiUrl}/api/points?user_id=${user.id}`);
         const data = await response.json();
         const pointsSum = data.reduce((total, item) => total + item.points, 0);
         setTotalPoints(pointsSum);

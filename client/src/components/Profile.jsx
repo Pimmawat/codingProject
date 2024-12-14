@@ -4,6 +4,7 @@ import { useUser } from './userContext';
 import './css/Profile.css';
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Profile = () => {
     const { user, setUser, logout } = useUser();
@@ -32,7 +33,7 @@ const Profile = () => {
     useEffect(() => {
         if (user?.id) {
             axios
-                .get(`http://localhost:3001/api/profile${user.id}`)
+                .get(`${apiUrl}/api/profile${user.id}`)
                 .then((response) => {
                     const { name, email, phone, password, created_at } = response.data;
                     setFormData({
@@ -68,7 +69,7 @@ const Profile = () => {
         setLoading(true);
         setMessage("");
         axios
-            .put(`http://localhost:3001/api/profile/${user.id}`, formData)
+            .put(`${apiUrl}/api/profile/${user.id}`, formData)
             .then(() => {
                 Swal.fire({
                     title: 'ข้อมูลได้รับการอัปเดต',

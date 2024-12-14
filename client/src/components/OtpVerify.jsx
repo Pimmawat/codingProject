@@ -2,6 +2,7 @@ import React, { useState,useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Loading from './Loading';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const OtpVerify = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const OtpVerify = () => {
   useEffect(() => {
     const checkOtpExpiry = async () => {
         try {
-          const response = await fetch('http://localhost:3001/api/member/check-otp-expiry', {
+          const response = await fetch(`${apiUrl}/api/member/check-otp-expiry`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ const OtpVerify = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:3001/api/member/verify-otp', {
+      const response = await fetch(`${apiUrl}/api/member/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

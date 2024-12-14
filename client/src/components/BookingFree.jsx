@@ -5,6 +5,7 @@ import { useUser } from './userContext';
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading';
 import { useLocation } from 'react-router-dom';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const BookingFree = () => {
     const { user } = useUser();
@@ -22,7 +23,7 @@ const BookingFree = () => {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/bookings');
+                const response = await fetch(`${apiUrl}/api/bookings`);
                 const data = await response.json();
                 setBookedTimes(data);  // เก็บข้อมูลการจองใน state
                 console.log(data);

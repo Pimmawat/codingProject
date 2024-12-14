@@ -3,6 +3,8 @@ import QRCode from 'react-qr-code';
 import './css/Ticket.css';
 import Loading from './Loading';
 import { useUser } from './userContext';
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 const Ticket = () => {
     const { user } = useUser();
@@ -20,7 +22,7 @@ const Ticket = () => {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/tickets?user_id=${user.id}`); // ใช้ user_id แทน phone
+                const response = await fetch(`${apiUrl}/api/tickets?user_id=${user.id}`); // ใช้ user_id แทน phone
                 const data = await response.json();
                 console.log(data);
                 setBookings(data);

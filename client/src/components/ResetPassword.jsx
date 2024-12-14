@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import './css/ResetPassword.css';
+const apiUrl = import.meta.env.VITE_API_URL;
+
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -37,7 +39,7 @@ const ResetPassword = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/auth/resetpassword', {
+            const response = await fetch(`${apiUrl}/api/auth/resetpassword`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

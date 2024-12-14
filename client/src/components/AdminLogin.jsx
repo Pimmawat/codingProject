@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './css/AdminLogin.css'; // นำเข้าไฟล์ CSS
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -21,7 +22,7 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3001/api/admin/login', {
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

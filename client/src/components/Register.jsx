@@ -2,6 +2,7 @@ import React, { useState , useEffect} from 'react';
 import './css/Register.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom'; 
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -34,7 +35,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/member/register', {
+      const response = await fetch(`${apiUrl}/api/member/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

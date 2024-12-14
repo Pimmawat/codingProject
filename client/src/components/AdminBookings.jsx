@@ -18,6 +18,7 @@ import {
 import Swal from "sweetalert2";
 import './css/AdminBookings.css';
 import Loading from "./Loading";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const AdminBookings = () => {
     const [bookings, setBookings] = useState([]);
@@ -44,14 +45,14 @@ const AdminBookings = () => {
                 text: 'ไม่มีToken โปรดลองอีกครั้ง',
             }).then(() => navigate('/'));
         }
-        axios.get("http://localhost:3001/api/admin/bookings")
+        axios.get(`${apiUrl}:3001/api/admin/bookings`)
             .then((response) => {
                 setBookings(response.data);
             })
             .catch((error) => {
                 console.error("Error fetching bookings:", error);
             });
-        axios.get("http://localhost:3001/api/admin/users")
+        axios.get(`${apiUrl}/api/admin/users`)
             .then((response) => {
                 setUsers(response.data);
             })
@@ -72,7 +73,7 @@ const AdminBookings = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(`http://localhost:3001/api/admin/bookings/${booking_id}`)
+                    .delete(`${apiUrl}/api/admin/bookings/${booking_id}`)
                     .then(() => {
                         setBookings(bookings.filter((booking) => booking.booking_id !== booking_id));
                         Swal.fire("ลบสำเร็จ!", "การจองถูกลบเรียบร้อยแล้ว", "success");
