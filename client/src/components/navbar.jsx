@@ -6,7 +6,6 @@ import Nav from 'react-bootstrap/Nav';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './css/Navbar.css';
 import { useUser } from './userContext';
-import { useAdmin } from './adminContext';
 
 function Navbar1() {
   const [admin, setAdmin] = useState(null);
