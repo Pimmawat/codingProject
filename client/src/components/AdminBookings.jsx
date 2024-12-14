@@ -45,7 +45,7 @@ const AdminBookings = () => {
                 text: 'ไม่มีToken โปรดลองอีกครั้ง',
             }).then(() => navigate('/'));
         }
-        axios.get(`${apiUrl}:3001/api/admin/bookings`)
+        axios.get(`${apiUrl}/api/admin/bookings`)
             .then((response) => {
                 setBookings(response.data);
             })
@@ -60,6 +60,9 @@ const AdminBookings = () => {
                 console.error("Error fetching users:", error);
             });
     }, []);
+    if (!Array.isArray()) {
+        return <div className='no-user'>ไม่พบข้อมูลผู้ใช้</div>;
+    }
 
     // ฟังก์ชันลบการจอง
     const handleDelete = (booking_id) => {

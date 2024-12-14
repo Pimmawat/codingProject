@@ -18,3 +18,8 @@
 .MuiButton-root {
     margin-top: 10px;
 }
+
+.no-user {
+    margin-top: 150px;
+    justify-self: center;
+}

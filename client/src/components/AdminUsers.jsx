@@ -41,6 +41,10 @@ const AdminUsers = () => {
             });
     }, []);
 
+    if (!Array.isArray(filteredUsers)) {
+        return <div className='no-user'>ไม่พบข้อมูลผู้ใช้</div>;
+    }
+
     // ฟังก์ชันลบผู้ใช้
     const handleDelete = (id) => {
         Swal.fire({
