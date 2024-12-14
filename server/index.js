@@ -111,6 +111,7 @@ app.post('/api/bookings', (req, res) => {
     });
   });
 });
+
 app.get('/', (req,res) => {
   res.send("THis is API CpeArena");
 });
@@ -721,3 +722,5 @@ app.delete('/api/admin/bookings/:id', async (req, res) => {
 app.listen(3001, () => {
   console.log('Server running on port 3001');
 });
+
+module.exports = app
