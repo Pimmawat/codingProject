@@ -723,6 +723,55 @@ app.delete('/api/admin/bookings/:id', async (req, res) => {
   }
 });
 
+//Iot ESP32CAM
+
+app.post('/api/iot/check-qr', async (req, res) => {
+  const { booking_id, date, startTime, endTime } = req.body;
+
+  // ตรวจสอบว่ารับค่ามาครบหรือไม่
+  if (!booking_id || !date || !startTime || !endTime) {
+    return res.status(400).json({ message: 'ข้อมูลไม่ครบถ้วน' });
+  }
+
+  // ดึงข้อมูลจากฐานข้อมูล
+  db.query('SELECT * FROM reserve WHERE booking_id = ?', [booking_id], (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
+    }
+
+    if (rows.length === 0) {
+      return res.status(404).json({ status: 'fail', message: 'ไม่พบข้อมูลการจอง' });
+    }
+
+    const booking = rows[0];
+    console.log(booking_id, date, startTime, endTime);
+    console.log(booking);
+    // ตรวจสอบว่าข้อมูลที่ส่งมาตรงกับข้อมูลในฐานข้อมูลหรือไม่
+    const isDateMatch = booking.date === date;
+    const isStartTimeMatch = booking.startTime === startTime;
+    const isEndTimeMatch = booking.endTime === endTime;
+
+    if (!isDateMatch || !isStartTimeMatch || !isEndTimeMatch) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'ข้อมูลไม่ตรงกับที่บันทึกไว้'
+      });
+    }
+
+    // ตรวจสอบว่าขณะนี้อยู่ในช่วงเวลาที่จองไว้หรือไม่
+    const now = dayjs();
+    const startDateTime = dayjs(`${date} ${startTime}`, 'YYYY-MM-DD HH:mm');
+    const endDateTime = dayjs(`${date} ${endTime}`, 'YYYY-MM-DD HH:mm');
+
+    if (now.isAfter(startDateTime) && now.isBefore(endDateTime)) {
+      return res.json({ status: 'ok', message: 'อยู่ในช่วงเวลาที่จอง' });
+    } else {
+      return res.json({ status: 'fail', message: 'ไม่อยู่ในช่วงเวลาที่จอง' });
+    }
+  });
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
