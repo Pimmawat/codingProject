@@ -60,9 +60,6 @@ const AdminBookings = () => {
                 console.error("Error fetching users:", error);
             });
     }, []);
-    if (!Array.isArray()) {
-        return <div className='no-user'>ไม่พบข้อมูลผู้ใช้</div>;
-    }
 
     // ฟังก์ชันลบการจอง
     const handleDelete = (booking_id) => {
