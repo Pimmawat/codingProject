@@ -536,7 +536,7 @@ app.post('/api/auth/forgetpassword', (req, res) => {
     // สร้างโทเค็นสำหรับรีเซ็ตรหัสผ่าน
     const user = results[0];
     const token = jwt.sign({ email: user.email }, 'hellohackerman', { expiresIn: '1h' });
-    const resetLink = `http://localhost:5173/resetpassword/${token}`;
+    const resetLink = `https://coding-project-api.vercel.app/resetpassword/${token}`;
 
     // ส่งอีเมล
     sendResetEmail(user.email, resetLink);
