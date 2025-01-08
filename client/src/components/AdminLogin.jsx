@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import './css/AdminLogin.css'; 
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // ตัวแปร loading
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,6 +24,7 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // เริ่มแสดงหน้า Loading
     try {
       const response = await fetch(`${apiUrl}/api/admin/login`, {
         method: 'POST',
@@ -32,7 +36,6 @@ const AdminLogin = () => {
 
       const data = await response.json();
       if (response.ok) {
-        // เก็บ token ใน localStorage
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminData', JSON.stringify(data.admin));
         Swal.fire({
@@ -41,9 +44,11 @@ const AdminLogin = () => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
+          setLoading(false); // หยุดหน้า Loading
           navigate('/admin/dashboard'); 
         });
       } else {
+        setLoading(false); // หยุดหน้า Loading
         Swal.fire({
           title: 'ข้อผิดพลาด!',
           text: data.message,
@@ -52,6 +57,7 @@ const AdminLogin = () => {
         });
       }
     } catch (error) {
+      setLoading(false); // หยุดหน้า Loading
       console.error(error);
       Swal.fire({
         title: 'เกิดข้อผิดพลาด!',
@@ -61,6 +67,11 @@ const AdminLogin = () => {
       });
     }
   };
+
+  // ถ้า loading เป็น true ให้แสดงหน้า Loading
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="login-form">

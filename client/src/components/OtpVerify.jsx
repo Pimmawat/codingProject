@@ -1,7 +1,7 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Loading from './Loading';
+import Loading from './Loading'; // คอมโพเนนต์ Loading
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const OtpVerify = () => {
@@ -13,15 +13,16 @@ const OtpVerify = () => {
 
   useEffect(() => {
     const checkOtpExpiry = async () => {
-        try {
-          const response = await fetch(`${apiUrl}/api/member/check-otp-expiry`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ phone }),
-          });
-          const data = await response.json();
+      try {
+        setIsLoading(true); // เริ่มแสดง Loading
+        const response = await fetch(`${apiUrl}/api/member/check-otp-expiry`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ phone }),
+        });
+        const data = await response.json();
 
         if (!response.ok) {
           Swal.fire({
@@ -40,11 +41,13 @@ const OtpVerify = () => {
           icon: 'error',
           confirmButtonText: 'ตกลง',
         });
+      } finally {
+        setIsLoading(false); // หยุดแสดง Loading
       }
     };
 
     if (!phone) {
-      setIsLoading(true);
+      setIsLoading(true); // เริ่มแสดง Loading
       setTimeout(() => {
         Swal.fire({
           title: 'ข้อผิดพลาด!',
@@ -54,15 +57,16 @@ const OtpVerify = () => {
         }).then(() => {
           navigate('/register');
         });
-      }, 2000); 
-    }else{
-        checkOtpExpiry();
+      }, 2000);
+    } else {
+      checkOtpExpiry();
     }
   }, [phone, navigate]);
 
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    
+    setIsLoading(true); // เริ่มแสดง Loading
+
     try {
       const response = await fetch(`${apiUrl}/api/member/verify-otp`, {
         method: 'POST',
@@ -81,7 +85,7 @@ const OtpVerify = () => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
-          navigate('/login');
+          navigate('/login'); // ไปยังหน้า Login
         });
       } else {
         Swal.fire({
@@ -98,12 +102,13 @@ const OtpVerify = () => {
         icon: 'error',
         confirmButtonText: 'ตกลง',
       });
+    } finally {
+      setIsLoading(false); // หยุดแสดง Loading
     }
   };
+
   if (isLoading) {
-    return (
-      <Loading />
-    );
+    return <Loading />; // แสดงหน้า Loading
   }
 
   return (

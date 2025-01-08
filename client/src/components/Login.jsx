@@ -3,12 +3,15 @@ import './css/Login.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from './userContext';
+import Loading from './Loading'; // เพิ่มการ import Loading
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Login = ({ handleLoginSuccess }) => {
   const { user, setUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // เพิ่ม state สำหรับการแสดง Loading
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +31,7 @@ const Login = ({ handleLoginSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true); // เริ่มแสดง Loading
     try {
       const response = await fetch(`${apiUrl}/api/member/login`, {
         method: 'POST',
@@ -54,9 +57,11 @@ const Login = ({ handleLoginSuccess }) => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
+          setLoading(false); // หยุดหน้า Loading
           navigate('/ticket');
         });
       } else {
+        setLoading(false); // หยุดหน้า Loading
         Swal.fire({
           title: 'ข้อผิดพลาด!',
           text: data.message,
@@ -65,6 +70,7 @@ const Login = ({ handleLoginSuccess }) => {
         });
       }
     } catch (error) {
+      setLoading(false); // หยุดหน้า Loading
       console.error(error);
       Swal.fire({
         title: 'เกิดข้อผิดพลาด!',
@@ -74,6 +80,11 @@ const Login = ({ handleLoginSuccess }) => {
       });
     }
   };
+
+  // ถ้า loading เป็น true ให้แสดงหน้า Loading
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -104,7 +115,7 @@ const Login = ({ handleLoginSuccess }) => {
           </div>
           <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
         </form>
-        <div className='admin-con'>
+        <div className="admin-con">
           <a href="/admin/login">สำหรับแอดมิน</a>
         </div>
       </div>

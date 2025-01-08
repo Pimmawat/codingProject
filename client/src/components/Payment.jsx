@@ -36,7 +36,6 @@ const Payment = () => {
     const handlePayment = async () => {
         if (!state || !state.timeUsed) return;
         setLoading(true);
-
         try {
             const response = await fetch(`${apiUrl}/api/payment/generate-qrcode`, {
                 method: 'POST',
@@ -98,6 +97,7 @@ const Payment = () => {
     }, [countdownInterval, filePreview]);
 
     const handleFileUpload = async () => {
+        setLoading(true);
         if (!file) {
             Swal.fire({
                 title: 'เกิดข้อผิดพลาด',
@@ -127,10 +127,12 @@ const Payment = () => {
                     icon: 'success',
                     confirmButtonText: 'ตกลง',
                 }).then(() => {
+                    setLoading(false);
                     handlePaymentSuccess();
                     navigate('/ticket');
                 });
             } else {
+                setLoading(false);
                 Swal.fire({
                     title: 'จองไม่สำเร็จ',
                     text: `${responseData.message}`,
@@ -231,7 +233,7 @@ const Payment = () => {
                             </tr>
                         </tbody>
                     </table>
-    
+
                     <button
                         onClick={handlePaymentClick}
                         className="submit-btn"
@@ -239,7 +241,7 @@ const Payment = () => {
                     >
                         {loading ? 'กำลังสร้าง QR Code...' : 'สร้าง QR code'}
                     </button>
-    
+
                     {qrCodeUrl && timeLeft > 0 ? (
                         <div className="qr-code-section">
                             <h3>ชำระเงิน {amount} บาท</h3>
@@ -250,14 +252,14 @@ const Payment = () => {
                     ) : qrCodeUrl && timeLeft === 0 ? (
                         <p>QR Code หมดอายุแล้ว กรุณาสร้างใหม่</p>
                     ) : null}
-    
+
                     <div className="upload-section">
                         {qrCodeUrl && timeLeft > 0 && (
                             <>
                                 <input type="file" onChange={handleFileChange} accept="image/*" />
                                 {filePreview && <img src={filePreview} alt="ตัวอย่างสลิป" className="file-preview" />}
-                                <button onClick={handleFileUpload} className="submit-btn">
-                                    แนบสลิปและส่ง
+                                <button onClick={handleFileUpload} className="submit-btn" disabled={loading}>
+                                    {loading ? 'กำลังสร้าง QR Code...' : 'สร้าง QR code'}
                                 </button>
                             </>
                         )}
@@ -265,7 +267,7 @@ const Payment = () => {
                 </div>
             )}
         </>
-    );    
+    );
 };
 
 export default Payment;

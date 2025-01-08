@@ -12,7 +12,7 @@ function Navbar1() {
   const { user, logout } = useUser();
   const navigate = useNavigate();
 
-  // ดึงข้อมูลจาก localStorage เมื่อ component โหลด
+  
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('adminData')) || null;
     if (userData) {

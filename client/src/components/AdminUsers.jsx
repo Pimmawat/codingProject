@@ -60,14 +60,18 @@ const AdminUsers = () => {
                 // ลบผู้ใช้จากระบบ
                 axios.delete(`${apiUrl}/api/admin/users/${id}`)
                     .then(() => {
-                        setUsers(users.filter(user => user.id !== id));
+                        // อัปเดต state ให้ลบผู้ใช้ที่ตรงกับ ID ออกจาก users และ filteredUsers
+                        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+                        setFilteredUsers((prevFilteredUsers) =>
+                            prevFilteredUsers.filter((user) => user.id !== id)
+                        );
                         Swal.fire(
                             'ลบแล้ว!',
                             'ผู้ใช้งานถูกลบเรียบร้อยแล้ว.',
                             'success'
                         );
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         Swal.fire(
                             'เกิดข้อผิดพลาด!',
                             'ไม่สามารถลบผู้ใช้งานได้.',
@@ -78,6 +82,7 @@ const AdminUsers = () => {
             }
         });
     };
+    
 
     const formatDate = (date) => {
         return new Date(date).toLocaleString('th-TH', {

@@ -1,7 +1,8 @@
-import React, { useState , useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/Register.css';
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import Loading from './Loading'; // เพิ่มการ import Loading
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Register = () => {
@@ -12,7 +13,8 @@ const Register = () => {
     password: '',
   });
 
-  const navigate = useNavigate(); 
+  const [loading, setLoading] = useState(false); // เพิ่ม state สำหรับจัดการหน้า Loading
+  const navigate = useNavigate();
   const [isOTPStage, setIsOTPStage] = useState(false);
   const [otpData, setOtpData] = useState({ phone: '', otp: '' });
 
@@ -23,9 +25,11 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // เริ่มแสดง Loading
 
     const phonePattern = /^[0-9]{10}$/;
     if (!phonePattern.test(form.phone)) {
+      setLoading(false); // หยุดหน้า Loading
       return Swal.fire({
         title: 'ข้อผิดพลาด!',
         text: 'กรุณากรอกเบอร์โทรในรูปแบบที่ถูกต้อง',
@@ -44,7 +48,6 @@ const Register = () => {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         Swal.fire({
           title: 'สำเร็จ!',
@@ -52,10 +55,12 @@ const Register = () => {
           icon: 'success',
           confirmButtonText: 'ตกลง',
         }).then(() => {
+          setLoading(false); // หยุดหน้า Loading
           navigate('/register/otpVerify', { state: { phone: form.phone } });
         });
         setForm({ name: '', email: '', phone: '', password: '' });
       } else {
+        setLoading(false); // หยุดหน้า Loading
         Swal.fire({
           title: 'ข้อผิดพลาด!',
           text: data.message,
@@ -64,6 +69,7 @@ const Register = () => {
         });
       }
     } catch (error) {
+      setLoading(false); // หยุดหน้า Loading
       console.error(error);
 
       Swal.fire({
@@ -74,7 +80,11 @@ const Register = () => {
       });
     }
   };
-  
+
+  if (loading) {
+    return <Loading />; // แสดงหน้า Loading ขณะกำลังส่งข้อมูล
+  }
+
   if (isOTPStage) {
     return (
       <div className="otp-verification">
@@ -86,11 +96,10 @@ const Register = () => {
               type="text"
               id="otp"
               name="otp"
-              value={otpData.otp} 
-              onChange={(e) => setOtpData((prev) => ({ ...prev, otp: e.target.value }))} // อัปเดต otp
+              value={otpData.otp}
+              onChange={(e) => setOtpData((prev) => ({ ...prev, otp: e.target.value }))}
               required
             />
-
           </div>
           <button type="submit" className="submit-button">ยืนยัน</button>
         </form>

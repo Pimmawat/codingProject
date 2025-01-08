@@ -4,6 +4,7 @@ import { useUser } from './userContext';
 import './css/Profile.css';
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Profile = () => {
@@ -99,7 +100,7 @@ const Profile = () => {
         <div className="profile-container">
             <h1>แก้ไขโปรไฟล์</h1>
             {loading ? (
-                <p>Loading...</p>
+                <Loading />
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div>
