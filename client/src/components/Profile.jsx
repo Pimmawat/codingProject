@@ -31,6 +31,7 @@ const Profile = () => {
     };
 
     useEffect(() => {
+        setLoading(true);
         if (user?.id) {
             axios
                 .get(`${apiUrl}/api/profile${user.id}`)
@@ -47,7 +48,7 @@ const Profile = () => {
                 .catch((error) => {
                     console.error("Error fetching profile:", error);
                     setMessage("ไม่สามารถดึงข้อมูลโปรไฟล์ได้");
-                });
+                }).finally(() => setLoading(false));
         }
     }, [user]);
 

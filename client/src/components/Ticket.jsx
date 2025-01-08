@@ -124,7 +124,8 @@ const Ticket = () => {
                                 startTime: selectedBooking.startTime,
                                 endTime: selectedBooking.endTime,
                             })}
-                            size={128}
+                            size={256}
+                            level='L'
                         />
                     </div>
                 </div>
