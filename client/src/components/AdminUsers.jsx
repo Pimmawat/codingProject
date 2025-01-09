@@ -60,7 +60,6 @@ const AdminUsers = () => {
                 // ลบผู้ใช้จากระบบ
                 axios.delete(`${apiUrl}/api/admin/users/${id}`)
                     .then(() => {
-                        // อัปเดต state ให้ลบผู้ใช้ที่ตรงกับ ID ออกจาก users และ filteredUsers
                         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
                         setFilteredUsers((prevFilteredUsers) =>
                             prevFilteredUsers.filter((user) => user.id !== id)

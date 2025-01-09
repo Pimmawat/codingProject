@@ -12,6 +12,7 @@ const AdminDashboard = () => {
   const [admin, setAdmin] = useState(null);
   const [userCount, setUserCount] = useState(0);
   const [reserveCount, setReserveCount] = useState(0);
+  const [quotaCount, setQuotaCount] = useState(0);
   const navigate = useNavigate();
 
   // ดึงข้อมูลแอดมินจาก localStorage

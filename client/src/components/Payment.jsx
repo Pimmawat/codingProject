@@ -259,7 +259,7 @@ const Payment = () => {
                                 <input type="file" onChange={handleFileChange} accept="image/*" />
                                 {filePreview && <img src={filePreview} alt="ตัวอย่างสลิป" className="file-preview" />}
                                 <button onClick={handleFileUpload} className="submit-btn" disabled={loading}>
-                                    {loading ? 'กำลังสร้าง QR Code...' : 'สร้าง QR code'}
+                                    {loading ? 'กำลังโหลด' : 'แนบสลีปการโอนเงิน'}
                                 </button>
                             </>
                         )}
