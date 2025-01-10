@@ -16,22 +16,6 @@ dayjs.extend(isBetween);
 const JWT_SECRET = 'hellohackerman';
 
 const upload = multer({ storage: multer.memoryStorage() });
-const uploadQR = multer({
-  dest: 'uploads/', // โฟลเดอร์สำหรับเก็บไฟล์
-  limits: {
-    fileSize: 5 * 1024 * 1024, // จำกัดขนาดไฟล์ที่ 5MB
-  },
-  fileFilter: (req, file, cb) => {
-    // ตรวจสอบประเภทไฟล์
-    const filetypes = /jpeg|jpg|png/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error('Invalid file type! Only JPEG and PNG are allowed.'));
-  },
-});
 
 const app = express();
 
@@ -97,6 +81,10 @@ const sendResetEmail = (email, resetLink) => {
   });
 };
 
+app.get('/', (req, res) => {
+  res.send("THis is API CpeArena");
+});
+
 app.post('/api/bookings', (req, res) => {
   const { id, field, date, startTime, endTime, timeUsed } = req.body;
   console.log(id, field, date, startTime, endTime, timeUsed);
@@ -131,31 +119,6 @@ app.post('/api/bookings', (req, res) => {
       });
     });
   });
-});
-
-app.get('/', (req, res) => {
-  res.send("THis is API CpeArena");
-});
-
-app.post('/api/upload', uploadQR.single('file'), (req, res) => {
-  try {
-    // ตรวจสอบว่ามีไฟล์ที่อัปโหลดมาหรือไม่
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    // ข้อมูลไฟล์
-    console.log('File uploaded:', req.file);
-
-    // ตอบกลับไปยัง ESP32
-    res.status(200).json({
-      message: 'File uploaded successfully',
-      filename: req.file.filename, // ชื่อไฟล์ที่บันทึก
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Something went wrong' });
-  }
 });
 
 app.post('/api/redeem/bookings', (req, res) => {
@@ -762,7 +725,6 @@ app.delete('/api/admin/bookings/:id', async (req, res) => {
 });
 
 //Iot ESP32CAM
-
 app.post('/api/iot/check-qr', async (req, res) => {
   const { booking_id, date, startTime, endTime } = req.body;
 
