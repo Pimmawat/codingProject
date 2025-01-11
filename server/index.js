@@ -12,6 +12,11 @@ const dayjs = require("dayjs");
 const isBetween = require('dayjs/plugin/isBetween');
 const nodemailer = require('nodemailer');
 dayjs.extend(isBetween);
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 
 const JWT_SECRET = 'hellohackerman';
 
