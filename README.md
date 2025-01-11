@@ -1,9 +1,28 @@
-# ระบบจองสนามฟุตบอล
+# CPE Arena
 
-## วิธีติดตั้งโปรแกรม
-1. git clone
-2. cd server
-3. npm install
-4. cd client
-5. npm install
-6. npm run dev ทั้ง2ตัว
+This Project is a Thesis RMUTL 
+
+by Pimmawat Saita
+
+Computer Engineering 
+
+## Installation
+
+Use the package manager [node.js](https://nodejs.org/en) to install nodejs
+and [vite.js](https://vite.dev/) to install vite.js
+
+```bash
+git clone https://github.com/Pimmawat/codingProject.git
+cd server
+npm install
+npm run dev 
+cd client
+npm install
+npm run dev
+```
+
+
+
+## License
+
+[Pimmawat Saita](https://github.com/Pimmawat)
