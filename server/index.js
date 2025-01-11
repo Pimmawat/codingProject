@@ -750,12 +750,20 @@ app.post('/api/iot/check-qr', async (req, res) => {
     }
 
     const booking = rows[0];
-    console.log(booking_id, date, startTime, endTime);
-    console.log(booking);
-    // ตรวจสอบว่าข้อมูลที่ส่งมาตรงกับข้อมูลในฐานข้อมูลหรือไม่
+    console.log("Data from API:", { booking_id, date, startTime, endTime });
+    console.log("Data from DB:", { 
+      booking_id: booking.booking_id, 
+      date: booking.date, 
+      startTime: booking.startTime, 
+      endTime: booking.endTime 
+    });
     const isDateMatch = booking.date === date;
-    const isStartTimeMatch = booking.startTime === startTime;
-    const isEndTimeMatch = booking.endTime === endTime;
+    const isStartTimeMatch = booking.startTime.startsWith(startTime); // เปรียบเทียบเฉพาะ HH:mm
+    const isEndTimeMatch = booking.endTime.startsWith(endTime);
+    console.log("Comparison Results:");
+    console.log("Date Match:", isDateMatch);
+    console.log("Start Time Match:", isStartTimeMatch);
+    console.log("End Time Match:", isEndTimeMatch);
 
     if (!isDateMatch || !isStartTimeMatch || !isEndTimeMatch) {
       return res.status(400).json({
@@ -766,37 +774,17 @@ app.post('/api/iot/check-qr', async (req, res) => {
 
     // ตรวจสอบว่าขณะนี้อยู่ในช่วงเวลาที่จองไว้หรือไม่
     const now = dayjs().tz("Asia/Bangkok");
-    const startDateTime = dayjs.tz(`${date} ${startTime}`, 'YYYY-MM-DD HH:mm');
-    const endDateTime = dayjs.tz(`${date} ${endTime}`, 'YYYY-MM-DD HH:mm');
-    console.log("Current Time:", now.format());
-    console.log("Start Time:", startDateTime.format());
-    console.log("End Time:", endDateTime.format());
-    console.log("Data from API:", { booking_id, date, startTime, endTime });
-    console.log("Data from DB:", {
-      booking_id: booking.booking_id,
-      date: booking.date,
-      startTime: booking.startTime,
-      endTime: booking.endTime
-    });
-
-    console.log("Comparison Results:");
-    console.log("Date Match:", booking.date === date);
-    console.log("Start Time Match:", booking.startTime.startsWith(startTime));
-    console.log("End Time Match:", booking.endTime.startsWith(endTime));
-
+    const startDateTime = dayjs.tz(`${date} ${startTime}`, 'YYYY-MM-DD HH:mm', "Asia/Bangkok");
+    const endDateTime = dayjs.tz(`${date} ${endTime}`, 'YYYY-MM-DD HH:mm', "Asia/Bangkok");
     console.log("Current Time:", now.format());
     console.log("Start DateTime:", startDateTime.format());
     console.log("End DateTime:", endDateTime.format());
-    console.log("Is After Start:", now.isAfter(startDateTime));
-    console.log("Is Before End:", now.isBefore(endDateTime));
 
     if (now.isAfter(startDateTime) && now.isBefore(endDateTime)) {
       return res.status(200).json({ status: 'ok', message: 'อยู่ในช่วงเวลาที่จอง' });
     } else {
       return res.status(400).json({ status: 'fail', message: 'ไม่อยู่ในช่วงเวลาที่จอง' });
     }
-
-
   });
 });
 
