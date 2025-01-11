@@ -765,9 +765,9 @@ app.post('/api/iot/check-qr', async (req, res) => {
     const endDateTime = dayjs(`${date} ${endTime}`, 'YYYY-MM-DD HH:mm');
 
     if (now.isAfter(startDateTime) && now.isBefore(endDateTime)) {
-      return res.json({ status: 'ok', message: 'อยู่ในช่วงเวลาที่จอง' });
+      return res.status(200).json({ status: 'ok', message: 'อยู่ในช่วงเวลาที่จอง' });
     } else {
-      return res.json({ status: 'fail', message: 'ไม่อยู่ในช่วงเวลาที่จอง' });
+      return res.status(400).json({ status: 'fail', message: 'ไม่อยู่ในช่วงเวลาที่จอง' });
     }
   });
 });
