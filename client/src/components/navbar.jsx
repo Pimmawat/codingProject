@@ -44,7 +44,7 @@ function Navbar1() {
                 className="d-flex align-items-center"
               >
                 <img
-                  src="/profile-placeholder.png"
+                  src="/soccerplayer.png"
                   alt="Profile"
                   className="rounded-circle me-2"
                   style={{ width: '30px', height: '30px' }}
