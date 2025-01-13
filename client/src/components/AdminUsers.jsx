@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper, Typography, TextField, Box } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper, Typography, TextField, Box, Modal } from '@mui/material';
 import Swal from 'sweetalert2'; // นำเข้า SweetAlert2
 import './css/AdminUsers.css';
 import Loading from './Loading';
 import { useNavigate } from 'react-router-dom';
+import EditUserModal from './EditUserModal';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const AdminUsers = () => {
@@ -12,7 +13,27 @@ const AdminUsers = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [admin, setAdmin] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null); // ผู้ใช้ที่ถูกเลือกสำหรับแก้ไข
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
     const navigate = useNavigate();
+    const handleOpenEditModal = (user) => {
+        setSelectedUser(user);
+        setEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setSelectedUser(null);
+        setEditModalOpen(false);
+    };
+
+    const handleUpdateUser = (updatedUser) => {
+        setUsers((prevUsers) => prevUsers.map(user =>
+            user.id === updatedUser.id ? updatedUser : user
+        ));
+        setFilteredUsers((prevFilteredUsers) => prevFilteredUsers.map(user =>
+            user.id === updatedUser.id ? updatedUser : user
+        ));
+    }
 
     const verify = (is_verified) => {
         return is_verified === 1 ? 'ยืนยันตัวตนแล้ว' : 'ยังไม่ได้ยืนยันตัวตน';
@@ -81,7 +102,7 @@ const AdminUsers = () => {
             }
         });
     };
-    
+
 
     const formatDate = (date) => {
         return new Date(date).toLocaleString('th-TH', {
@@ -110,8 +131,9 @@ const AdminUsers = () => {
         <div className="admin-users">
             <Container maxWidth="lg">
                 <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold', color: '#1976d2' }}>จัดการข้อมูลผู้ใช้งาน</Typography>
-                <Box sx={{ mb: 3 ,}}>
+                <Box sx={{ mb: 3, }}>
                     <TextField
+                        inputProps={{ style: { padding: '20px' } }}
                         placeholder="ค้นหาผู้ใช้งาน"
                         variant="outlined"
                         fullWidth
@@ -141,11 +163,19 @@ const AdminUsers = () => {
                                     <TableCell>
                                         <Button
                                             variant="contained"
+                                            color="primary"
+                                            onClick={() => handleOpenEditModal(user)}
+                                            sx={{ borderRadius: "20px", marginRight: 2 }}
+                                        >
+                                            แก้ไข
+                                        </Button>
+                                        <Button
+                                            variant="contained"
                                             color="secondary"
                                             onClick={() => handleDelete(user.id)}
                                             sx={{
                                                 backgroundColor: '#d32f2f',
-                                                '&:hover': { backgroundColor: '#c62828' },
+                                                borderRadius: "20px"
                                             }}
                                         >
                                             ลบ
@@ -156,6 +186,14 @@ const AdminUsers = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                {selectedUser && (
+                    <EditUserModal
+                        open={isEditModalOpen}
+                        onClose={handleCloseEditModal}
+                        user={selectedUser}
+                        onUpdate={handleUpdateUser}
+                    />
+                )}
             </Container>
         </div>
     );

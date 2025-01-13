@@ -18,6 +18,8 @@ import {
 import Swal from "sweetalert2";
 import './css/AdminBookings.css';
 import Loading from "./Loading";
+import EditBookingModal from "./EditBookingModal";
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const AdminBookings = () => {
@@ -25,6 +27,8 @@ const AdminBookings = () => {
     const [admin, setAdmin] = useState();
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const navigate = useNavigate();
 
     const getUserName = (userId) => {
@@ -32,7 +36,6 @@ const AdminBookings = () => {
         return user ? user.name : "ไม่พบชื่อ";
     };
 
-    // ดึงข้อมูลการจองจาก API
     useEffect(() => {
         const savedAdmin = JSON.parse(localStorage.getItem('adminData'));
         if (savedAdmin) {
@@ -61,7 +64,6 @@ const AdminBookings = () => {
             });
     }, []);
 
-    // ฟังก์ชันลบการจอง
     const handleDelete = (booking_id) => {
         Swal.fire({
             title: "คุณต้องการลบการจองนี้หรือไม่?",
@@ -86,15 +88,12 @@ const AdminBookings = () => {
         });
     };
 
-    // กรองข้อมูลการจองตามชื่อผู้ใช้งานหรือสนาม
     const filteredBookings = bookings.filter(
         (booking) =>
-            (getUserName(booking.user_id) && getUserName(booking.user_id).toString().includes(searchQuery)) || // ค้นหาโดย user_id
-            (booking.field && booking.field.toLowerCase().includes(searchQuery)) // ค้นหาโดย field
-
+            (getUserName(booking.user_id) && getUserName(booking.user_id).toString().includes(searchQuery)) ||
+            (booking.field && booking.field.toLowerCase().includes(searchQuery))
     );
 
-    // แปลงวันที่ให้อยู่ในรูปแบบที่อ่านง่าย
     const formatDate = (date) => {
         return new Date(date).toLocaleString("th-TH", {
             year: "numeric",
@@ -104,12 +103,33 @@ const AdminBookings = () => {
             minute: "numeric"
         });
     };
+
     const formatDateNoTime = (date) => {
         return new Date(date).toLocaleString("th-TH", {
             year: "numeric",
             month: "long",
             day: "numeric",
         });
+    };
+
+    const handleEditBooking = (booking) => {
+        setSelectedBooking(booking);
+        setOpenModal(true);
+    };
+
+    const handleUpdateBooking = (updatedBooking) => {
+        axios.put(`${apiUrl}/api/admin/bookings/${updatedBooking.booking_id}`, updatedBooking)
+            .then((response) => {
+                setBookings(bookings.map((booking) =>
+                    booking.booking_id === updatedBooking.booking_id ? updatedBooking : booking
+                ));
+                Swal.fire("อัปเดตสำเร็จ!", "ข้อมูลการจองถูกอัปเดตแล้ว", "success");
+                setOpenModal(false);
+            })
+            .catch((error) => {
+                Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถอัปเดตข้อมูลการจองได้", "error");
+                console.error("Error updating booking:", error);
+            });
     };
 
     return (
@@ -125,6 +145,7 @@ const AdminBookings = () => {
 
             <Box sx={{ mb: 3 }}>
                 <TextField
+                    inputProps={{ style: { padding: '20px' } }}
                     placeholder="ค้นหา"
                     variant="outlined"
                     fullWidth
@@ -136,7 +157,6 @@ const AdminBookings = () => {
                 />
             </Box>
 
-
             <TableContainer component={Paper} sx={{
                 borderRadius: "20px", boxShadow: 3, overflow: "hidden",
                 marginTop: 2,
@@ -144,33 +164,15 @@ const AdminBookings = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                รหัสการจอง
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                ผู้ใช้
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                สนาม
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                วันที่
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                เวลาเริ่ม
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                เวลาสิ้นสุด
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                เวลาที่ใช้ (ชั่วโมง)
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                จองเมื่อ
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                จัดการ
-                            </TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>รหัสการจอง</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>ผู้ใช้</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>สนาม</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>วันที่</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาเริ่ม</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาสิ้นสุด</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาที่ใช้ (ชั่วโมง)</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>จองเมื่อ</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: "bold" }}>จัดการ</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -187,6 +189,14 @@ const AdminBookings = () => {
                                 <TableCell align="center">
                                     <Button
                                         variant="contained"
+                                        color="primary"
+                                        onClick={() => handleEditBooking(booking)}
+                                        sx={{ borderRadius: "20px", marginRight: 2 }}
+                                    >
+                                        แก้ไข
+                                    </Button>
+                                    <Button
+                                        variant="contained"
                                         color="error"
                                         onClick={() => handleDelete(booking.booking_id)}
                                         sx={{ borderRadius: "20px" }}
@@ -199,6 +209,15 @@ const AdminBookings = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {openModal && selectedBooking && (
+                <EditBookingModal
+                    open={openModal}
+                    onClose={() => setOpenModal(false)}
+                    booking={selectedBooking}
+                    onUpdate={handleUpdateBooking}
+                />
+            )}
         </Container>
     );
 };

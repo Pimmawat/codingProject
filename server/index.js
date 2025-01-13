@@ -729,6 +729,64 @@ app.delete('/api/admin/bookings/:id', async (req, res) => {
   }
 });
 
+app.put('/api/admin/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, email, phone } = req.body;
+
+  db.query(
+    'UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?',
+    [name, email, phone, id],
+    (error, results) => {
+      if (error) {
+        console.error('Error updating user:', error);
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'ไม่พบผู้ใช้งานที่ต้องการแก้ไข' });
+      }
+
+      res.json({ message: 'อัปเดตข้อมูลสำเร็จ' });
+    }
+  );
+});
+
+app.put("/api/admin/bookings/:booking_id", (req, res) => {
+  const { booking_id } = req.params; // รับ booking_id จาก URL
+  const { field, date, startTime, endTime, timeUsed } = req.body; // รับข้อมูลใหม่จาก request body
+  console.log(booking_id,field, date, startTime, endTime, timeUsed);
+
+  // ตรวจสอบว่าข้อมูลที่ต้องการอัปเดตครบถ้วนหรือไม่
+  if (!field || !date || !startTime || !endTime || !timeUsed) {
+    return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+  }
+  const checkQuery = `
+    SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
+  `;
+  db.query(checkQuery, [field, date, endTime, startTime], (err, results) => {
+    if (err) return res.status(500).send(err);
+    if (results.length > 0) {
+      return res.status(400).send({ message: 'เวลานี้ถูกจองแล้ว' });
+    }
+    const sql = `
+    UPDATE reserve 
+    SET field = ?, date = ?, startTime = ?, endTime = ?, timeUsed = ?
+    WHERE booking_id = ?
+  `;
+    db.query(sql, [field, date, startTime, endTime, timeUsed, booking_id], (err, result) => {
+      if (err) {
+        console.error("Error updating booking:", err);
+        return res.status(500).json({ message: "เกิดข้อผิดพลาดในการอัปเดตข้อมูล" });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "ไม่พบข้อมูลการจองที่ต้องการอัปเดต" });
+      }
+      res.status(200).json({ message: "อัปเดตข้อมูลสำเร็จ" });
+    });
+  }
+  )
+});
+
 //Iot ESP32CAM
 app.post('/api/iot/check-qr', async (req, res) => {
   const { booking_id, date, startTime, endTime } = req.body;
@@ -751,11 +809,11 @@ app.post('/api/iot/check-qr', async (req, res) => {
 
     const booking = rows[0];
     console.log("Data from API:", { booking_id, date, startTime, endTime });
-    console.log("Data from DB:", { 
-      booking_id: booking.booking_id, 
-      date: booking.date, 
-      startTime: booking.startTime, 
-      endTime: booking.endTime 
+    console.log("Data from DB:", {
+      booking_id: booking.booking_id,
+      date: booking.date,
+      startTime: booking.startTime,
+      endTime: booking.endTime
     });
     const isDateMatch = booking.date === date;
     const isStartTimeMatch = booking.startTime.startsWith(startTime); // เปรียบเทียบเฉพาะ HH:mm

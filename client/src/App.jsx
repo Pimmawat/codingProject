@@ -46,7 +46,7 @@ const App = () => {
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />         
             {/* Private Routes */}
             <Route
               path="/forgetpassword"
