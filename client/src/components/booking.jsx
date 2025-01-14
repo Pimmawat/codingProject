@@ -71,6 +71,22 @@ const Booking = () => {
         return endHour - startHour;
     };
 
+    const calculateRate = (startTime, endTime) => {
+        const startHour = parseInt(startTime.split(':')[0], 10);
+        const endHour = parseInt(endTime.split(':')[0], 10);
+    
+        let ratePerHour = 0;
+    
+        // ตรวจสอบว่าเวลาอยู่ในช่วงใด
+        if (startHour >= 8 && endHour <= 18) {
+            ratePerHour = 600;  // 08:00 - 18:00
+        } else if (startHour >= 18 && endHour <= 24) {
+            ratePerHour = 900;  // 18:00 - 24:00
+        }
+    
+        return ratePerHour;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -98,6 +114,7 @@ const Booking = () => {
             startTime,
             endTime,
             timeUsed: difference,
+            amount,
         };
 
         Swal.fire({
