@@ -133,92 +133,95 @@ const AdminBookings = () => {
     };
 
     return (
-        <Container sx={{ marginTop: 20 }}>
-            <Box sx={{ textAlign: "center", marginBottom: 2 }}>
-                <Typography variant="h4" gutterBottom>
-                    จัดการการจองสนาม
-                </Typography>
-                <Typography variant="subtitle1" color="text.secondary">
-                    ค้นหาและจัดการการจองทั้งหมดในระบบ
-                </Typography>
-            </Box>
+        <div className="admin-bookings-container-wrapper">
+            <div className="admin-bookings-overlay"></div>
+                <Container maxWidth="lg" sx={{ mt: 20 }}>
+                    <Box sx={{ textAlign: "center", marginBottom: 2 }}>
+                        <Typography variant="h4" gutterBottom>
+                            จัดการการจองสนาม
+                        </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            ค้นหาและจัดการการจองทั้งหมดในระบบ
+                        </Typography>
+                    </Box>
 
-            <Box sx={{ mb: 3 }}>
-                <TextField
-                    inputProps={{ style: { padding: '20px' } }}
-                    placeholder="ค้นหา"
-                    variant="outlined"
-                    fullWidth
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    sx={{
-                        boxShadow: 3,
-                        borderRadius: "8px",
-                    }}
-                />
-            </Box>
+                    <Box sx={{ mb: 3 }}>
+                        <TextField
+                            inputProps={{ style: { padding: '20px' } }}
+                            placeholder="ค้นหา"
+                            variant="outlined"
+                            fullWidth
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            sx={{
+                                boxShadow: 3,
+                                borderRadius: "8px",
+                            }}
+                        />
+                    </Box>
 
-            <TableContainer component={Paper} sx={{
-                borderRadius: "20px", boxShadow: 3, overflow: "hidden",
-                marginTop: 2,
-            }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>รหัสการจอง</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>ผู้ใช้</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>สนาม</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>วันที่</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาเริ่ม</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาสิ้นสุด</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาที่ใช้ (ชั่วโมง)</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>จองเมื่อ</TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>จัดการ</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filteredBookings.map((booking) => (
-                            <TableRow key={booking.booking_id} hover>
-                                <TableCell align="center">{booking.booking_id}</TableCell>
-                                <TableCell align="center">{getUserName(booking.user_id)}</TableCell>
-                                <TableCell align="center">{booking.field}</TableCell>
-                                <TableCell align="center">{formatDateNoTime(booking.date)}</TableCell>
-                                <TableCell align="center">{booking.startTime}</TableCell>
-                                <TableCell align="center">{booking.endTime}</TableCell>
-                                <TableCell align="center">{booking.timeUsed}</TableCell>
-                                <TableCell align="center">{formatDate(booking.created_at)}</TableCell>
-                                <TableCell align="center">
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => handleEditBooking(booking)}
-                                        sx={{ borderRadius: "20px", marginRight: 2 }}
-                                    >
-                                        แก้ไข
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="error"
-                                        onClick={() => handleDelete(booking.booking_id)}
-                                        sx={{ borderRadius: "20px" }}
-                                    >
-                                        ลบ
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                    <TableContainer component={Paper} sx={{
+                        borderRadius: "20px", boxShadow: 3,
+                        marginTop: 2,
+                    }}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>รหัสการจอง</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>ผู้ใช้</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>สนาม</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>วันที่</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาเริ่ม</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาสิ้นสุด</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาที่ใช้ (ชั่วโมง)</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>จองเมื่อ</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>จัดการ</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredBookings.map((booking) => (
+                                    <TableRow key={booking.booking_id} hover>
+                                        <TableCell align="center">{booking.booking_id}</TableCell>
+                                        <TableCell align="center">{getUserName(booking.user_id)}</TableCell>
+                                        <TableCell align="center">{booking.field}</TableCell>
+                                        <TableCell align="center">{formatDateNoTime(booking.date)}</TableCell>
+                                        <TableCell align="center">{booking.startTime}</TableCell>
+                                        <TableCell align="center">{booking.endTime}</TableCell>
+                                        <TableCell align="center">{booking.timeUsed}</TableCell>
+                                        <TableCell align="center">{formatDate(booking.created_at)}</TableCell>
+                                        <TableCell align="center">
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleEditBooking(booking)}
+                                                sx={{ borderRadius: "20px", marginRight: 2 }}
+                                            >
+                                                แก้ไข
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="error"
+                                                onClick={() => handleDelete(booking.booking_id)}
+                                                sx={{ borderRadius: "20px" }}
+                                            >
+                                                ลบ
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
 
-            {openModal && selectedBooking && (
-                <EditBookingModal
-                    open={openModal}
-                    onClose={() => setOpenModal(false)}
-                    booking={selectedBooking}
-                    onUpdate={handleUpdateBooking}
-                />
-            )}
-        </Container>
+                    {openModal && selectedBooking && (
+                        <EditBookingModal
+                            open={openModal}
+                            onClose={() => setOpenModal(false)}
+                            booking={selectedBooking}
+                            onUpdate={handleUpdateBooking}
+                        />
+                    )}
+                </Container>
+            </div>
     );
 };
 

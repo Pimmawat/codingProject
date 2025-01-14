@@ -48,19 +48,22 @@ const Points = () => {
   }
 
   return (
-    <div className="points-container">
-      <h2 className="points-header">แต้มสะสมของคุณ</h2>
-      <div className="points-box">
-        <p>
-          <strong><span className="points-total">{totalPoints} แต้ม</span></strong> 
-        </p>
+    <div className="points-container-wrapper">
+      <div className="points-overlay"></div>
+      <div className="points-container">
+        <h2 className="points-header">แต้มสะสมของคุณ</h2>
+        <div className="points-box">
+          <p>
+            <strong><span className="points-total">{totalPoints} แต้ม</span></strong>
+          </p>
+        </div>
+        <button
+          className={`redeem-button ${totalPoints >= 100 ? 'active' : 'disabled'}`}
+          onClick={handleRedeemPoints}
+        >
+          {totalPoints >= 100 ? 'แลกแต้มเพื่อจองสนามฟรี' : 'แต้มไม่เพียงพอ'}
+        </button>
       </div>
-      <button
-        className={`redeem-button ${totalPoints >= 100 ? 'active' : 'disabled'}`}
-        onClick={handleRedeemPoints}
-      >
-        {totalPoints >= 100 ? 'แลกแต้มเพื่อจองสนามฟรี' : 'แต้มไม่เพียงพอ'}
-      </button>
     </div>
   );
 };

@@ -1,14 +1,58 @@
-/* Ticket Container */
-.ticket-container {
-    max-width: 800px;
-    margin: 0 auto;
-    margin-top: 150px;
-    padding: 20px;
-    text-align: center;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+/* Ticket Container Wrapper */
+.background-wrapper {
+    background: url('/bg4.jpg') no-repeat center center fixed; /* พื้นหลัง */
+    background-size: cover; /* ครอบคลุมทั้งหน้าจอ */
+    position: fixed; /* ทำให้พื้นหลังอยู่คงที่ */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* อยู่ด้านหลังเนื้อหา */
+    overflow: hidden;
 }
+
+.ticket-container-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh; /* ปรับให้เต็มความสูงของ viewport */
+    overflow-y: auto; /* เพิ่มการเลื่อนในแนวตั้ง */
+    padding: 20px 0;
+}
+
+.ticket-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* เพิ่มความมืด */
+    z-index: 1;
+}
+
+.ticket-container {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    width: 90%; /* รองรับหน้าจอเล็ก */
+    max-height: 80vh;
+    padding: 30px 20px;
+    background-color: rgba(255, 255, 255, 0.9); /* พื้นหลังโปร่งแสง */
+    border-radius: 20px 20px 20px 20px ;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin-top: 100px;
+    overflow: auto; /* เพิ่มการเลื่อนในแนวตั้ง */
+}
+@media (max-width: 768px) {
+    .ticket-container {
+        max-height: 70vh; /* ลดความสูงสูงสุด */
+        padding: 20px 10px;
+    }
+}
+
 
 h2 {
     color: #333;
@@ -39,6 +83,7 @@ h2 {
     background-color: #f2f2f2;
 }
 
+/* Button */
 .qr-button {
     padding: 8px 16px;
     background-color: #007BFF;
@@ -54,16 +99,16 @@ h2 {
 }
 
 .qr-button:disabled {
-    background-color: #d6d6d6; /* สีเทาเมื่อปิดการใช้งาน */
-    color: #888888; /* สีตัวอักษรอ่อนลง */
-    cursor: not-allowed; /* เปลี่ยน cursor */
+    background-color: #d6d6d6;
+    color: #888888;
+    cursor: not-allowed;
     text-decoration: line-through solid hotpink;
 }
 
 /* Modal */
 .modal {
     position: fixed;
-    z-index: 1;
+    z-index: 3;
     left: 0;
     top: 0;
     width: 100%;
@@ -82,7 +127,6 @@ h2 {
     width: 300px;
     text-align: center;
     position: relative;
-    justify-content: center;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 

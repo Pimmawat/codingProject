@@ -74,63 +74,68 @@ const Ticket = () => {
     console.log('Sorted bookings:', sortedBookings);
 
     return (
-        <div className="ticket-container">
-            <h2>ข้อมูลการจองของคุณ</h2>
-            {sortedBookings.length > 0 ? (
-                <table className="booking-table">
-                    <thead>
-                        <tr>
-                            <th onClick={() => handleSort('date')}>วันที่ {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                            <th onClick={() => handleSort('startTime')}>เวลา {sortConfig.key === 'startTime' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                            <th onClick={() => handleSort('field')}>สนาม {sortConfig.key === 'field' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                            <th>QR Code</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedBookings.map((booking, index) => {
-                            const isExpired = new Date(`${booking.date}T${booking.endTime}`) < new Date(); // ตรวจสอบว่าการจองหมดอายุหรือยัง
-                            return (
-                                <tr key={booking.booking_id || `booking-${index}`}>
-                                    <td>{formatDate(booking.date)}</td>
-                                    <td>{booking.startTime} - {booking.endTime}</td>
-                                    <td>{booking.field}</td>
-                                    <td>
-                                        <button
-                                            onClick={() => openModal(booking.booking_id)}
-                                            className="qr-button"
-                                            disabled={isExpired} // ปิดการใช้งานถ้าเลยเวลาสิ้นสุด
-                                        >
-                                            {isExpired ? 'หมดเวลา' : 'แสดง QR Code'}
-                                        </button>
-                                    </td>
+        <div className="background-wrapper">
+            <div className="ticket-container-wrapper">
+                <div className="ticket-overlay"></div>
+                <div className="ticket-container">
+                    <h2>ข้อมูลการจองของคุณ</h2>
+                    {sortedBookings.length > 0 ? (
+                        <table className="booking-table">
+                            <thead>
+                                <tr>
+                                    <th onClick={() => handleSort('date')}>วันที่ {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                                    <th onClick={() => handleSort('startTime')}>เวลา {sortConfig.key === 'startTime' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                                    <th onClick={() => handleSort('field')}>สนาม {sortConfig.key === 'field' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
+                                    <th>QR Code</th>
                                 </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            ) : (
-                <p className="no-bookings">ไม่มีข้อมูลการจอง</p>
-            )}
-            {showQRCode && selectedBooking ? (
-                <div className="modal">
-                    <div className="modal-content">
-                        <span className="close" onClick={closeModal}>&times;</span>
-                        <h3>QR Code การจอง</h3>
-                        <QRCode
-                            className="qr-code"
-                            value={JSON.stringify({
-                                booking_id: selectedBooking.booking_id,
-                                date: selectedBooking.date,
-                                startTime: selectedBooking.startTime,
-                                endTime: selectedBooking.endTime,
-                            })}
-                            size={256}
-                            level='L'
-                        />
-                    </div>
+                            </thead>
+                            <tbody>
+                                {sortedBookings.map((booking, index) => {
+                                    const isExpired = new Date(`${booking.date}T${booking.endTime}`) < new Date(); // ตรวจสอบว่าการจองหมดอายุหรือยัง
+                                    return (
+                                        <tr key={booking.booking_id || `booking-${index}`}>
+                                            <td>{formatDate(booking.date)}</td>
+                                            <td>{booking.startTime} - {booking.endTime}</td>
+                                            <td>{booking.field}</td>
+                                            <td>
+                                                <button
+                                                    onClick={() => openModal(booking.booking_id)}
+                                                    className="qr-button"
+                                                    disabled={isExpired} // ปิดการใช้งานถ้าเลยเวลาสิ้นสุด
+                                                >
+                                                    {isExpired ? 'หมดเวลา' : 'แสดง QR Code'}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p className="no-bookings">ไม่มีข้อมูลการจอง</p>
+                    )}
+                    {showQRCode && selectedBooking ? (
+                        <div className="modal">
+                            <div className="modal-content">
+                                <span className="close" onClick={closeModal}>&times;</span>
+                                <h3>QR Code การจอง</h3>
+                                <QRCode
+                                    className="qr-code"
+                                    value={JSON.stringify({
+                                        booking_id: selectedBooking.booking_id,
+                                        date: selectedBooking.date,
+                                        startTime: selectedBooking.startTime,
+                                        endTime: selectedBooking.endTime,
+                                    })}
+                                    size={128}
+                                />
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
-            ) : null}
+            </div>
         </div>
+
     );
 };
 

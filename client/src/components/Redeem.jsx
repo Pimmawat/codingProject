@@ -67,41 +67,45 @@ const Redeem = () => {
   };
 
   return (
-    <div className="payment-form">
-      <h2>ข้อมูลการจอง</h2>
-      <table>
-        <tbody>
-          <tr>
-            <th>สนาม</th>
-            <td>{state.field}</td>
-          </tr>
-          <tr>
-            <th>วันที่</th>
-            <td>{formatDate(state.date)}</td>
-          </tr>
-          <tr>
-            <th>เวลาเริ่ม</th>
-            <td>{state.startTime}</td>
-          </tr>
-          <tr>
-            <th>เวลาสิ้นสุด</th>
-            <td>{state.endTime}</td>
-          </tr>
-          <tr>
-            <th>เวลาที่ใช้</th>
-            <td>{state.timeUsed} ชั่วโมง</td>
-          </tr>
-        </tbody>
-      </table>
-      <div className="points-box">
-        <div className="points-total">แลก {state.timeUsed * 100} แต้ม</div>
-      </div>
-      <div className="upload-section">
-        <button onClick={handleRedeemPoint} className="submit-btn">
-          แลกแต้ม
-        </button>
+    <div className="payment-container-wrapper">
+      <div className="payment-overlay"></div>
+      <div className="payment-form">
+        <h2>ข้อมูลการจอง</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th>สนาม</th>
+              <td>{state.field}</td>
+            </tr>
+            <tr>
+              <th>วันที่</th>
+              <td>{formatDate(state.date)}</td>
+            </tr>
+            <tr>
+              <th>เวลาเริ่ม</th>
+              <td>{state.startTime}</td>
+            </tr>
+            <tr>
+              <th>เวลาสิ้นสุด</th>
+              <td>{state.endTime}</td>
+            </tr>
+            <tr>
+              <th>เวลาที่ใช้</th>
+              <td>{state.timeUsed} ชั่วโมง</td>
+            </tr>
+          </tbody>
+        </table>
+        <div className="points-box">
+          <div className="points-total">แลก {state.timeUsed * 100} แต้ม</div>
+        </div>
+        <div className="upload-section">
+          <button onClick={handleRedeemPoint} className="submit-btn">
+            แลกแต้ม
+          </button>
+        </div>
       </div>
     </div>
+
   );
 };
 

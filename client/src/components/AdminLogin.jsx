@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './css/AdminLogin.css'; 
+import './css/AdminLogin.css';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading';
@@ -45,7 +45,7 @@ const AdminLogin = () => {
           confirmButtonText: 'ตกลง',
         }).then(() => {
           setLoading(false); // หยุดหน้า Loading
-          navigate('/admin/dashboard'); 
+          navigate('/admin/dashboard');
         });
       } else {
         setLoading(false); // หยุดหน้า Loading
@@ -74,33 +74,36 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="login-form">
-      <h2>เข้าสู่ระบบแอดมิน</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">อีเมลล์:</label>
-          <input
-            type="text" 
-            id="username"
-            name="username"
-            value={username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">รหัสผ่าน:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
-      </form>
+    <div className="admin-login-container-wrapper">
+      <div className="admin-login-overlay"></div>
+      <div className="login-form">
+        <h2>เข้าสู่ระบบแอดมิน</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">อีเมลล์:</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={username}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">รหัสผ่าน:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
+        </form>
+      </div>
     </div>
   );
 };

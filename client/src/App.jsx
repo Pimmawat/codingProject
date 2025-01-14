@@ -17,6 +17,8 @@ import Redeem from './components/Redeem';
 import Profile from './components/Profile';
 import ForgetPassword from './components/ForgetPassword';
 import ResetPassword from './components/ResetPassword';
+import Resetpass from './components/Resetpass';
+import UpdatePassword from './components/UpdatePassword';
 // admin
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
@@ -46,7 +48,9 @@ const App = () => {
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/bookings" element={<AdminBookings />} />         
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path='/Resetpass'  element={<Resetpass />}/>
+            <Route path='/reset-password' element={<UpdatePassword/>} />       
             {/* Private Routes */}
             <Route
               path="/forgetpassword"

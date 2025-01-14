@@ -1,13 +1,306 @@
-.header {
-    max-width: 70%;
-    margin: 0 auto;
-    margin-top: 150px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.home-container {
+  background: url('/bg2.jpeg') no-repeat center 20px fixed;
+  background-size: cover;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transform: translateZ(0);
+  z-index: 0;
 }
 
-.h1{
-    text-align: center;
+/* ชั้น overlay เพื่อเพิ่มความมืดให้กับพื้นหลัง */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* เพิ่มความมืดให้กับภาพพื้นหลัง */
+  z-index: 1;
+}
+
+/* สไตล์หัวข้อ */
+.header {
+  position: relative;
+  z-index: 2;
+  max-width: 70%;
+  padding: 80px;
+  background-color: #fff;
+  /* พื้นหลังสีขาวโปร่งแสง */
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: fadeIn 2s ease-in-out;
+
+}
+
+.h1 {
+  font-size: 4rem;
+  color: #000000;
+  /* สีเขียวเข้มเหมาะกับสนามฟุตบอล */
+  margin-bottom: 20px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.sub-text {
+  font-size: 2rem;
+  color: #000000;
+  /* สีเขียวที่เข้มขึ้น */
+  margin-bottom: 30px;
+
+}
+
+.booking-button {
+  display: inline-block;
+  padding: 20px 50px;
+  background-color: #43a047;
+  /* สีเขียวเข้ม */
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.booking-button:hover {
+  background-color: #388e3c;
+  /* สีเขียวเข้มขึ้นเมื่อ hover */
+  transform: scale(1.05);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  animation: slideIn 1s ease-out;
+}
+
+/* สไตล์สำหรับข้อความวิ่ง */
+.marquee {
+  position: fixed;
+  bottom: 0;
+  /* ชิดด้านล่าง */
+  left: 0;
+  width: 100%;
+  white-space: nowrap;
+  /* ป้องกันข้อความขึ้นบรรทัดใหม่ */
+  overflow: hidden;
+  z-index: 3;
+  /* ให้อยู่ด้านบนสุด */
+}
+
+.marquee p {
+  display: inline-block;
+  font-size: 1.5rem;
+  color: #fff;
+  padding: 10px;
+  animation: marquee-right-to-left 10s linear infinite;
+  /* เรียกใช้งาน animation */
+}
+
+/* กำหนด animation เลื่อนจากขวาไปซ้าย */
+@keyframes marquee-right-to-left {
+  from {
+    transform: translateX(100%);
+    /* เริ่มจากขวาสุด */
+  }
+
+  to {
+    transform: translateX(-100%);
+    /* เลื่อนไปซ้ายสุด */
+  }
+}
+
+.promotion-section {
+  padding: 50px 20px;
+  background-color: #f5f5f5;
+  /* พื้นหลังสีอ่อน */
+  text-align: center;
+}
+
+.promotion-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.promotion-container {
+  display: flex;
+  flex-direction: column;
+  /* จัดเรียงแบบแนวตั้ง */
+  align-items: center;
+  gap: 40px;
+  /* เว้นระยะห่างระหว่างรายการ */
+}
+
+.promotion-item {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  max-width: 2000px;
+  /* ขยายความกว้างของกล่อง */
+  text-align: center;
+}
+
+.promotion-image {
+  width: 100%;
+  /* ทำให้รูปขยายเต็มความกว้างของกล่อง */
+  max-height: 400px;
+  /* กำหนดความสูงสูงสุด */
+  object-fit: cover;
+  /* ครอบรูปให้พอดีกับกล่อง */
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.large-image {
+  max-height: 1000px;
+  /* ปรับความสูงรูปภาพใหญ่ขึ้น */
+}
+
+.promotion-text {
+  font-size: 1.4rem;
+  color: #555;
+  font-weight: bold;
+}
+
+.rules-section {
+  padding: 50px 20px;
+  background-color: #ffffff;
+  /* สีพื้นหลังขาว */
+  text-align: center;
+  margin: 20px 0;
+}
+
+.rules-title {
+  font-size: 3rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.rules-list {
+  list-style-type: disc;
+  /* สัญลักษณ์จุดสำหรับรายการ */
+  margin: 0 auto;
+  padding: 0;
+  max-width: 600px;
+  /* กำหนดความกว้าง */
+  text-align: left;
+  /* จัดข้อความให้อยู่ทางซ้าย */
+}
+
+.rules-list li {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* Responsive สำหรับหน้าจอขนาดเล็ก (มือถือ) */
+@media (max-width: 768px) {
+  .home-container {
+    background: url('/bg2.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    padding: 20px;
+    height: auto;
+    margin-top: 100px;
+    align-items: flex-start;
+    /* ปรับให้อยู่ด้านบน */
+  }
+
+  .header {
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .h1 {
+    font-size: 2.5rem;
+    /* ลดขนาดฟอนต์ */
+  }
+
+  .sub-text {
+    font-size: 1.5rem;
+  }
+
+  .booking-button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+  }
+
+  .promotion-container {
+    flex-direction: column;
+    /* จัดเรียงแนวตั้ง */
+  }
+
+  .promotion-item {
+    max-width: 90%;
+    /* ลดความกว้าง */
+  }
+
+  .promotion-image {
+    max-height: 250px;
+    /* ลดขนาดรูป */
+  }
+
+  .rules-list li {
+    font-size: 1rem;
+    /* ลดขนาดฟอนต์ */
+  }
+}
+
+/* Responsive สำหรับหน้าจอแท็บเล็ต */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .home-container {
+    padding: 30px;
+    height: auto;
+    margin-top: 100px;
+  }
+
+  .header {
+    max-width: 80%;
+    padding: 40px;
+  }
+
+  .h1 {
+    font-size: 3rem;
+  }
+
+  .sub-text {
+    font-size: 1.8rem;
+  }
+
+  .booking-button {
+    padding: 20px 40px;
+    font-size: 1.4rem;
+  }
+
+  .promotion-item {
+    max-width: 80%;
+    /* ปรับให้เหมาะกับแท็บเล็ต */
+  }
+
+  .promotion-image {
+    max-height: 300px;
+  }
+
+  .rules-list li {
+    font-size: 1.1rem;
+  }
 }

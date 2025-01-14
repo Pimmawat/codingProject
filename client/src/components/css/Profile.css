@@ -1,12 +1,39 @@
+/* เพิ่มพื้นหลังและ overlay */
+.profile-container-wrapper {
+    background: url('/bg4.jpg') no-repeat center center fixed; /* ใช้ background เดียวกับ Login */
+    background-size: cover;
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transform: translateZ(0);
+    z-index: 0;
+}
+
+.profile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* ความมืดบาง ๆ */
+    z-index: 1;
+}
+
+/* สไตล์โปรไฟล์ */
 .profile-container {
+    position: relative;
+    z-index: 2;
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
-    margin-top: 150px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.9); /* พื้นหลังโปร่งแสง */
+    border-radius: 15px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
@@ -16,27 +43,25 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* สไตล์ข้อความแจ้งเตือน */
+/* ปรับปรุงสไตล์ข้อความและปุ่ม */
 p {
     text-align: center;
     color: #e74c3c;
     font-size: 1rem;
 }
 
-/* ฟอร์มและช่อง input */
 form {
     display: grid;
     gap: 15px;
 }
 
-/* การจัดแต่งช่อง input */
 input[type="text"],
 input[type="email"] {
-    padding: 10px;
+    padding: 12px;
     font-size: 1rem;
     width: 100%;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 8px;
     box-sizing: border-box;
 }
 
@@ -48,21 +73,22 @@ input[type="text"]:focus,
 input[type="email"]:focus {
     outline: none;
     border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
-/* ปุ่มบันทึก */
 button {
-    background-color: #3498db;
+    background-color: #43a047; /* สีเขียวเดียวกับ Login */
     color: white;
     font-size: 1rem;
-    padding: 10px;
+    padding: 12px;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
     width: 100%;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #388e3c; /* สีเขียวเข้มขึ้น */
+    transform: scale(1.05);
 }

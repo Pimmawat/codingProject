@@ -87,7 +87,8 @@ const Login = ({ handleLoginSuccess }) => {
   }
 
   return (
-    <>
+    <div className="login-container">
+      <div className="login-overlay"></div>
       <div className="login-form">
         <h2>เข้าสู่ระบบ</h2>
         <form onSubmit={handleSubmit}>
@@ -115,11 +116,12 @@ const Login = ({ handleLoginSuccess }) => {
           </div>
           <button type="submit" className="submit-button">เข้าสู่ระบบ</button>
         </form>
-        <div className="admin-con">
+        <div className='admin-con'>
           <a href="/admin/login">สำหรับแอดมิน</a>
+          <a href="/Resetpass">ลืมรหัสผ่าน</a>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

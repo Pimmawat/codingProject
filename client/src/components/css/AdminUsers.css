@@ -1,25 +1,65 @@
-/* src/css/AdminUsers.css */
 .admin-users {
-    padding: 20px;
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.9); /* ความโปร่งใสเล็กน้อย */
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+    max-width: 1400px;
+    margin: 0 auto;
     margin-top: 150px;
+    overflow-x: auto; /* เปิด scroll แนวนอนในกรณีตารางยาว */
 }
 
+/* Header */
 .admin-users .MuiTypography-h4 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 600;
     margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Table Styling */
+.MuiTable-root {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
 .MuiTableCell-root {
     font-size: 1rem;
     padding: 16px;
+    border: 1px solid #ddd;
+    text-align: center;
 }
 
+.MuiTableCell-head {
+    background-color: #e0ffde;
+    color: white;
+    font-weight: bold;
+}
+
+.MuiTableRow-root:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.MuiTableRow-root:hover {
+    background-color: rgba(0, 123, 255, 0.1); /* เพิ่มสีเน้นเมื่อชี้เมาส์ */
+}
+
+/* Button Styling */
 .MuiButton-root {
-    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff; /* ปุ่มสีฟ้า */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.no-user {
-    margin-top: 150px;
-    justify-self: center;
+.MuiButton-root:hover {
+    background-color: #0056b3; /* ฟ้าเข้มขึ้น */
+    transform: scale(1.05);
 }

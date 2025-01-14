@@ -86,6 +86,90 @@ const sendResetEmail = (email, resetLink) => {
   });
 };
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'cpearena@gmail.com',
+    pass: 'ceem yoyn ilrp qsik',
+  },
+});
+
+app.post('/api/auth/resetpass', (req, res) => {
+  const { email } = req.body;
+
+  // ใช้ callback ในการ query
+  db.query('SELECT * FROM users WHERE email = ?', [email], (err, rows) => {
+    if (err) {
+      console.error('Error in database query:', err);
+      return res.status(500).json({ message: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง' });
+    }
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'ไม่พบอีเมลนี้ในระบบ' });
+    }
+
+    // สร้าง JWT Token สำหรับรีเซ็ตรหัสผ่าน
+    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '15m' });
+
+    // สร้างลิงก์รีเซ็ตรหัสผ่าน
+    const resetLink = `https://cpearena.vercel.app/reset-password?token=${token}`;
+
+    // ส่งอีเมล
+    transporter.sendMail({
+      from: '"รีเซ็ตรหัสผ่าน" <cpearena@gmail.com>',
+      to: email,
+      subject: 'ลิงก์รีเซ็ตรหัสผ่าน',
+      text: `คุณสามารถรีเซ็ตรหัสผ่านได้ที่ลิงก์นี้: ${resetLink}`,
+      html: `<p>คุณสามารถรีเซ็ตรหัสผ่านได้ที่ลิงก์นี้: <a href="${resetLink}">${resetLink}</a></p>`,
+    }, (err, info) => {
+      if (err) {
+        console.error('Error sending email:', err);
+        return res.status(500).json({ message: 'ไม่สามารถส่งอีเมลได้' });
+      }
+
+      // ตอบกลับสำเร็จ
+      res.json({ message: 'ลิงก์รีเซ็ตรหัสผ่านได้ถูกส่งไปยังอีเมลของคุณแล้ว' });
+    });
+  });
+});
+
+app.post('/api/auth/update-password', (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // ตรวจสอบ JWT Token
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // แฮชรหัสผ่านใหม่
+    bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+      if (err) {
+        console.error('Error hashing password:', err);
+        return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการแฮชรหัสผ่าน' });
+      }
+
+      // อัปเดตข้อมูลในฐานข้อมูล
+      db.query('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, decoded.email], (err, result) => {
+        if (err) {
+          console.error('Error updating password:', err);
+          return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตรหัสผ่าน' });
+        }
+
+        // ตรวจสอบว่ามีข้อมูลที่ได้รับการอัปเดต
+        if (result.affectedRows === 0) {
+          return res.status(400).json({ message: 'ไม่สามารถอัปเดตรหัสผ่านได้' });
+        }
+
+        // ส่งข้อความสำเร็จ
+        res.json({ message: 'รีเซ็ตรหัสผ่านสำเร็จแล้ว' });
+      });
+    });
+  } catch (err) {
+    console.error('Error in token verification:', err);
+    res.status(400).json({ message: 'ลิงก์รีเซ็ตรหัสผ่านหมดอายุหรือไม่ถูกต้อง' });
+  }
+});
+
+
 app.get('/', (req, res) => {
   res.send("THis is API CpeArena");
 });
@@ -754,7 +838,7 @@ app.put('/api/admin/users/:id', async (req, res) => {
 app.put("/api/admin/bookings/:booking_id", (req, res) => {
   const { booking_id } = req.params; // รับ booking_id จาก URL
   const { field, date, startTime, endTime, timeUsed } = req.body; // รับข้อมูลใหม่จาก request body
-  console.log(booking_id,field, date, startTime, endTime, timeUsed);
+  console.log(booking_id, field, date, startTime, endTime, timeUsed);
 
   // ตรวจสอบว่าข้อมูลที่ต้องการอัปเดตครบถ้วนหรือไม่
   if (!field || !date || !startTime || !endTime || !timeUsed) {
@@ -846,7 +930,7 @@ app.post('/api/iot/check-qr', async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

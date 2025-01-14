@@ -128,74 +128,80 @@ const AdminUsers = () => {
     };
 
     return (
-        <div className="admin-users">
-            <Container maxWidth="lg">
-                <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold', color: '#1976d2' }}>จัดการข้อมูลผู้ใช้งาน</Typography>
-                <Box sx={{ mb: 3, }}>
-                    <TextField
-                        inputProps={{ style: { padding: '20px' } }}
-                        placeholder="ค้นหาผู้ใช้งาน"
-                        variant="outlined"
-                        fullWidth
-                        onChange={handleSearch}
-                    />
-                </Box>
-                <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 3 }}>
-                    <Table>
-                        <TableHead sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>ชื่อ</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Email</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>เบอร์</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>วันที่สมัคร</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>ยืนยันตัวตน</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>จัดการ</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredUsers.map(user => (
-                                <TableRow key={user.id} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
-                                    <TableCell>{user.name}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.phone}</TableCell>
-                                    <TableCell>{formatDate(user.created_at)}</TableCell>
-                                    <TableCell>{verify(user.is_verified)}</TableCell>
-                                    <TableCell>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => handleOpenEditModal(user)}
-                                            sx={{ borderRadius: "20px", marginRight: 2 }}
-                                        >
-                                            แก้ไข
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="secondary"
-                                            onClick={() => handleDelete(user.id)}
-                                            sx={{
-                                                backgroundColor: '#d32f2f',
-                                                borderRadius: "20px"
-                                            }}
-                                        >
-                                            ลบ
-                                        </Button>
-                                    </TableCell>
+        <div className="admin-users-container-wrapper">
+            <div className="admin-users-overlay"></div>
+                <Container maxWidth="lg" sx={{ mt: 20 }}>
+                    <Typography variant="h4" align="center" sx={{ mb: 4, fontWeight: 'bold', color: '#1976d2' }}>จัดการข้อมูลผู้ใช้งาน</Typography>
+                    <Box sx={{ mb: 3, }}>
+                        <TextField
+                            inputProps={{ style: { padding: '20px' } }}
+                            placeholder="ค้นหาผู้ใช้งาน"
+                            variant="outlined"
+                            fullWidth
+                            onChange={handleSearch}
+                            sx={{
+                                boxShadow: 3,
+                                borderRadius: "8px",
+                            }}
+                        />
+                    </Box>
+                    <TableContainer component={Paper} sx={{ 
+                        borderRadius: 3, boxShadow: 3 }}>
+                        <Table>
+                            <TableHead sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>ชื่อ</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Email</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>เบอร์</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>วันที่สมัคร</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>ยืนยันตัวตน</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>จัดการ</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                {selectedUser && (
-                    <EditUserModal
-                        open={isEditModalOpen}
-                        onClose={handleCloseEditModal}
-                        user={selectedUser}
-                        onUpdate={handleUpdateUser}
-                    />
-                )}
-            </Container>
-        </div>
+                            </TableHead>
+                            <TableBody>
+                                {filteredUsers.map(user => (
+                                    <TableRow key={user.id} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
+                                        <TableCell>{user.name}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.phone}</TableCell>
+                                        <TableCell>{formatDate(user.created_at)}</TableCell>
+                                        <TableCell>{verify(user.is_verified)}</TableCell>
+                                        <TableCell>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleOpenEditModal(user)}
+                                                sx={{ borderRadius: "20px", marginRight: 2 }}
+                                            >
+                                                แก้ไข
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="secondary"
+                                                onClick={() => handleDelete(user.id)}
+                                                sx={{
+                                                    backgroundColor: '#d32f2f',
+                                                    borderRadius: "20px"
+                                                }}
+                                            >
+                                                ลบ
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    {selectedUser && (
+                        <EditUserModal
+                            open={isEditModalOpen}
+                            onClose={handleCloseEditModal}
+                            user={selectedUser}
+                            onUpdate={handleUpdateUser}
+                        />
+                    )}
+                </Container>
+            </div>
     );
 };
 

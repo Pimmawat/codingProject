@@ -97,53 +97,56 @@ const Profile = () => {
     };
 
     return (
-        <div className="profile-container">
-            <h1>แก้ไขโปรไฟล์</h1>
-            {loading ? (
-                <Loading />
-            ) : (
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>ชื่อ:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div>
-                        <label>เบอร์โทร:</label>
-                        <input
-                            type="text"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div>
-                        <label>อีเมล:</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            readOnly
-                        />
-                    </div>
-                    <div>
-                        <label>สร้างเมื่อ:</label>
-                        <input
-                            type="text"
-                            name="created_at"
-                            value={formatDate(formData.created_at)}
-                            onChange={handleInputChange}
-                            readOnly
-                        />
-                    </div>
-                    <a href="/forgetpassword">ลืมรหัสผ่าน</a>
+        <div className="profile-container-wrapper">
+            <div className="profile-overlay"></div>
+            <div className="profile-container">
+                <h1>แก้ไขโปรไฟล์</h1>
+                {loading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        <div>
+                            <label>ชื่อ:</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div>
+                            <label>เบอร์โทร:</label>
+                            <input
+                                type="text"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div>
+                            <label>อีเมล:</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                readOnly
+                            />
+                        </div>
+                        <div>
+                            <label>สร้างเมื่อ:</label>
+                            <input
+                                type="text"
+                                name="created_at"
+                                value={formatDate(formData.created_at)}
+                                onChange={handleInputChange}
+                                readOnly
+                            />
+                        </div>
+                        <a href="/forgetpassword">ลืมรหัสผ่าน</a>
                         <button type="submit">บันทึก</button>
-                </form>
-            )}
+                    </form>
+                )}
+            </div>
         </div>
     );
 };

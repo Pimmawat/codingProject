@@ -87,76 +87,84 @@ const Register = () => {
 
   if (isOTPStage) {
     return (
-      <div className="otp-verification">
-        <h2>ยืนยัน OTP</h2>
-        <form onSubmit={handleVerifyOTP}>
-          <div className="form-group">
-            <label htmlFor="otp">OTP:</label>
-            <input
-              type="text"
-              id="otp"
-              name="otp"
-              value={otpData.otp}
-              onChange={(e) => setOtpData((prev) => ({ ...prev, otp: e.target.value }))}
-              required
-            />
-          </div>
-          <button type="submit" className="submit-button">ยืนยัน</button>
-        </form>
+      <div className="register-container">
+        <div className="register-overlay"></div>
+        <div className="otp-verification">
+          <h2>ยืนยัน OTP</h2>
+          <form>
+            <div className="form-group">
+              <label htmlFor="otp">OTP:</label>
+              <input
+                type="text"
+                id="otp"
+                name="otp"
+                value={otpData.otp}
+                onChange={(e) =>
+                  setOtpData((prev) => ({ ...prev, otp: e.target.value }))
+                }
+                required
+              />
+            </div>
+            <button type="submit" className="submit-button">ยืนยัน</button>
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="register-form">
-      <h2>ลงทะเบียน</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="name">ชื่อ:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">อีเมลล์:</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="phone">เบอร์โทร:</label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">รหัสผ่าน:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" className="submit-button">ลงทะเบียน</button>
-      </form>
+    <div className="register-container">
+      <div className="register-overlay"></div>
+      <div className="register-form">
+        <h2>ลงทะเบียน</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">ชื่อ:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">อีเมลล์:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="phone">เบอร์โทร:</label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">รหัสผ่าน:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="submit-button">ลงทะเบียน</button>
+        </form>
+      </div>
     </div>
   );
 };

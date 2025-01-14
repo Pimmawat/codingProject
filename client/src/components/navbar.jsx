@@ -33,7 +33,7 @@ function Navbar1() {
       <Container>
         <Navbar.Brand as={Link} to="/" className="text-dark fw-bold d-flex align-items-center">
           <img src="/logo.svg" alt="Logo" className="logo me-2" style={{ width: '40px', height: '40px' }} />
-          Bookings
+          CPE Arena
         </Navbar.Brand>
         <Navbar.Collapse className="justify-content-end">
           {user ? (

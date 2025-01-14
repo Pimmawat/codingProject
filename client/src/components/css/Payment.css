@@ -1,114 +1,136 @@
-.payment-form {
+/* Payment Container Wrapper */
+.payment-container-wrapper {
+    background: url('/bg4.jpg') no-repeat center center fixed; /* ใช้พื้นหลังเดียวกัน */
+    background-size: cover;
+    position: relative;
+    min-height: 100vh; /* ใช้ min-height เพื่อให้คอนเทนเนอร์ครอบคลุมทั้งหน้า */
+    display: flex;
+    justify-content: center; /* จัดให้อยู่กึ่งกลางแนวนอน */
+    align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
+    overflow-y: auto; /* เปิดใช้งานการเลื่อนในแนวตั้ง */
+    padding: 20px; /* เพิ่มระยะขอบรอบๆ เพื่อการเลื่อน */
+  }
+  
+  .payment-overlay {
+    position: fixed; /* Overlay ครอบคลุมทั้งหน้าจอ */
+    top: 0;
+    left: 0;
+    height: 100%;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    margin-top: 150px;
-    margin-bottom: 150px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.payment-form h2 {
-    text-align: center;
-    color: #333;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-th,
-td {
-    padding: 12px 15px;
-    text-align: left;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-tr:nth-child(odd) {
-    background-color: #fff;
-}
-
-.submit-btn {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #28a745;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.submit-btn:hover {
-    background-color: #218838;
-}
-
-.qr-code-section {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.qr-code-section h3 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.qr-code-section img {
-    width: 200px;
-    height: 200px;
-    border: 2px solid #007bff;
-    border-radius: 10px;
-}
-
-.file-btn {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #257cff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.file-btn:hover {
-    background-color: #0f47be;
-}
-
-.upload-section {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.file-preview {
-    width: 300px;
-    border: 2px solid #007bff;
-    border-radius: 10px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-}
-
-.points-box {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-}
-
-.points-total {
-    font-size: 35px;
-    color: #007bff;
-    font-weight: bold;
-    justify-self: center;
-}
+    background-color: rgba(0, 0, 0, 0.5); /* สีดำโปร่งใส */
+    z-index: 1;
+  }
+  
+  /* Payment Form */
+  .payment-form {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      margin-top: 150px;
+      max-width: 600px;
+      padding: 30px 40px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+      overflow: visible; /* ให้เนื้อหาแสดงทั้งหมด */
+  }
+  
+    
+    .payment-form h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    
+    th,
+    td {
+      padding: 12px 15px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    
+    tr:nth-child(odd) {
+      background-color: #fff;
+    }
+    
+    /* Buttons */
+    .submit-btn,
+    .file-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #28a745;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    
+    .submit-btn:hover,
+    .file-btn:hover {
+      background-color: #388e3c; /* สีเขียวเข้มขึ้น */
+      transform: scale(1.05);
+    }
+    
+    /* QR Code Section */
+    .qr-code-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .qr-code-section h3 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .qr-code-section img {
+      width: 200px;
+      height: 200px;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+    }
+    
+    /* Upload Section */
+    .upload-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .file-preview {
+      width: 300px;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
+    
+    /* Points Box */
+    .points-box {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+    
+    .points-total {
+      font-size: 35px;
+      color: #007bff;
+      font-weight: bold;
+      justify-self: center;
+    }
+    

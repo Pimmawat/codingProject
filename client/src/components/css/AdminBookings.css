@@ -1,3 +1,24 @@
+.admin-bookings {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.9); /* ความโปร่งใสเล็กน้อย */
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-top: 150px;
+    overflow-x: auto; /* เปิด scroll แนวนอนในกรณีตารางยาว */
+}
+
+/* Header */
+.admin-bookings .MuiTypography-h4 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
 .MuiTableCell-body {
     text-align: center;
 }
