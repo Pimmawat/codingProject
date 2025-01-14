@@ -50,7 +50,7 @@ const BookingFree = () => {
         const currentDateTime = new Date(); // วันที่และเวลาปัจจุบัน
         const selectedDate = new Date(date);
 
-        for (let hour = 12; hour <= 23; hour++) {
+        for (let hour = 8; hour <= 23; hour++) {
             const timeString = `${hour.toString().padStart(2, '0')}:00`;
             const optionTime = new Date(`${date}T${timeString}`); // สร้าง Date object สำหรับเวลาที่จะตรวจสอบ
             // ตรวจสอบว่าเวลานี้ผ่านไปแล้วหรือไม่
