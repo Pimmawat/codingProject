@@ -7,26 +7,13 @@ const router = express.Router();
 const promptPayID = '0931713860'; 
 
 router.post('/generate-qrcode', async (req, res) => {
-    const { startTime, endTime } = req.body; 
+    const { timeUsed } = req.body; 
 
-    if (!startTime || !endTime || typeof startTime !== 'string' || typeof endTime !== 'string') {
+    if (!timeUsed || typeof timeUsed !== 'number') {
         return res.status(400).json({ message: 'ข้อมูลเวลาไม่ถูกต้อง' });
     }
 
-    const startHour = parseInt(startTime.split(':')[0]);
-    const endHour = parseInt(endTime.split(':')[0]);
-
-    let ratePerHour = 1; // default rate
-
-    // ตรวจสอบเงื่อนไขเวลา
-    if (startHour >= 8 && endHour <= 18) {
-        ratePerHour = 600;
-    } else if (startHour >= 18 && endHour <= 24) {
-        ratePerHour = 900;
-    }
-
-    const timeUsed = (endHour - startHour); // คำนวณเวลาใช้งาน
-
+    const ratePerHour = 1;
     const amount = timeUsed * ratePerHour;
 
     try {
