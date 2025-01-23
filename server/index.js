@@ -429,7 +429,7 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
     const form = new FormData();
     form.append('files', req.file.buffer, { filename: req.file.originalname });
     form.append('amount', amount);
-    //form.append('log', 'true');
+    form.append('log', 'true');
 
     const response = await axios.post(
       `https://api.slipok.com/api/line/apikey/${branchId}`,
@@ -930,7 +930,7 @@ app.post('/api/iot/check-qr', async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

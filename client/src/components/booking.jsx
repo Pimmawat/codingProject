@@ -89,6 +89,7 @@ const Booking = () => {
         }
 
         const difference = calculateTimeDifference(startTime, endTime);
+        const totalPrice = calculatePrice(startTime, endTime);
         setTimeDiff(difference);
 
         const bookingData = {
@@ -98,6 +99,7 @@ const Booking = () => {
             startTime,
             endTime,
             timeUsed: difference,
+            totalPrice,
         };
 
         Swal.fire({
@@ -108,6 +110,21 @@ const Booking = () => {
 
         // นำไปยังหน้าชำระเงินพร้อมข้อมูลการจอง
         navigate('/booking/payment', { state: bookingData });
+    };
+
+    const calculatePrice = (start, end) => {
+        const startHour = parseInt(start.split(':')[0], 10);
+        const endHour = parseInt(end.split(':')[0], 10);
+        let price = 0;
+    
+        for (let hour = startHour; hour < endHour; hour++) {
+            if (hour < 18) {
+                price += 600; // ราคา 600 บาทต่อชั่วโมงในช่วง 8:00 - 18:00
+            } else {
+                price += 900; // ราคา 900 บาทต่อชั่วโมงในช่วง 18:00 - 24:00
+            }
+        }
+        return price;
     };
 
     return (

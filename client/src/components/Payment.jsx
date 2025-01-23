@@ -34,7 +34,7 @@ const Payment = () => {
     console.log(state);
 
     const handlePayment = async () => {
-        if (!state || !state.timeUsed) return;
+        if (!state || !state.totalPrice) return;
         setLoading(true);
         try {
             const response = await fetch(`${apiUrl}/api/payment/generate-qrcode`, {
@@ -42,7 +42,7 @@ const Payment = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ timeUsed: state.timeUsed }),
+                body: JSON.stringify({ totalPrice: state.totalPrice }),
             });
 
             if (response.ok) {
@@ -135,6 +135,7 @@ const Payment = () => {
                 setLoading(false);
                 Swal.fire({
                     title: 'จองไม่สำเร็จ',
+
                     text: `${responseData.message}`,
                     icon: 'warning',
                     confirmButtonText: 'ลองอีกครั้ง',
@@ -232,6 +233,10 @@ const Payment = () => {
                                 <tr>
                                     <th>เวลาที่ใช้</th>
                                     <td>{state.timeUsed} ชั่วโมง</td>
+                                </tr>
+                                <tr>
+                                    <th>ราคาทั้งหมด</th>
+                                    <td>{state.totalPrice} บาท</td>
                                 </tr>
                             </tbody>
                         </table>
