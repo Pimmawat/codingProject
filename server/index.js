@@ -16,6 +16,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
+require('dotenv').config();
 
 
 const JWT_SECRET = 'hellohackerman';
@@ -423,13 +424,13 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
       return res.status(400).json({ message: 'กรุณาอัปโหลดไฟล์สลิป' });
     }
     const { amount } = req.body;
-    const branchId = "30828";
-    const apiKey = "SLIPOKE0E8CPS";
+    const branchId = process.env.BRANCH_ID;
+    const apiKey = process.env.API_KEY;
 
     const form = new FormData();
     form.append('files', req.file.buffer, { filename: req.file.originalname });
     form.append('amount', amount);
-    form.append('log', 'true');
+    //form.append('log', 'true');
 
     const response = await axios.post(
       `https://api.slipok.com/api/line/apikey/${branchId}`,
