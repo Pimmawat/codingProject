@@ -116,14 +116,7 @@ const AdminBookings = () => {
         setSelectedBooking(booking);
         setOpenModal(true);
     };
-
-    const handleViewSlip = (slipUrl) => {
-        if (slipUrl) {
-            window.open(slipUrl, "_blank");
-        } else {
-            Swal.fire("ไม่มีสลีป", "ไม่พบข้อมูลสลีปสำหรับการจองนี้", "info");
-        }
-    };
+    
     const handleUpdateBooking = (updatedBooking) => {
         axios.put(`${apiUrl}/api/admin/bookings/${updatedBooking.booking_id}`, updatedBooking)
             .then((response) => {
@@ -211,14 +204,6 @@ const AdminBookings = () => {
                                             sx={{ borderRadius: "20px" }}
                                         >
                                             ลบ
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="secondary"
-                                            onClick={() => handleViewSlip(booking.slipUrl)}
-                                            sx={{ borderRadius: "20px" }}
-                                        >
-                                            ดูสลีป
                                         </Button>
                                     </TableCell>
                                 </TableRow>
