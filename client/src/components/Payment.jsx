@@ -128,7 +128,9 @@ const Payment = () => {
                     confirmButtonText: 'ตกลง',
                 }).then(() => {
                     setLoading(false);
-                    handlePaymentSuccess();
+                    console.log(responseData.filePath);
+                    console.log(responseData.slipData.amount);
+                    handlePaymentSuccess(responseData.filePath,responseData.slipData.amount);
                     navigate('/ticket');
                 });
             } else {
@@ -146,10 +148,12 @@ const Payment = () => {
         }
     };
 
-    const handlePaymentSuccess = async () => {
+    const handlePaymentSuccess = async (filePath,amount) => {
         try {
             const bookingData = {
                 ...state
+                ,slip_url: filePath
+                ,amount: amount
             };
 
             const response = await fetch(`${apiUrl}/api/bookings`, {

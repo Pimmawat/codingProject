@@ -24,6 +24,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import AdminUsers from './components/AdminUsers';
 import AdminBookings from './components/AdminBookings';
+import CancelRequests from './components/CancelRequests';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -48,6 +49,7 @@ const App = () => {
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/cancel-request" element={<CancelRequests />}/>
             <Route path="/admin/bookings" element={<AdminBookings />} />
             <Route path='/Resetpass'  element={<Resetpass />}/>
             <Route path='/reset-password' element={<UpdatePassword/>} />       

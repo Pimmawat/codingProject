@@ -11,6 +11,7 @@ const AdminDashboard = () => {
   const [admin, setAdmin] = useState(null);
   const [userCount, setUserCount] = useState(0);
   const [reserveCount, setReserveCount] = useState(0);
+  const [cancelCount, setCancelCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -33,6 +34,9 @@ const AdminDashboard = () => {
 
         const reserveResponse = await axios.get(`${apiUrl}/api/reserves/count`);
         setReserveCount(reserveResponse.data.count);
+
+        const cancelResponse = await axios.get(`${apiUrl}/api/cancel/count`);
+        setCancelCount(cancelResponse.data.count);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -83,6 +87,13 @@ const AdminDashboard = () => {
                 <CardContent>
                   <Typography variant="h6" gutterBottom>จำนวนการจองสนาม</Typography>
                   <Typography variant="h4">{reserveCount} ครั้ง</Typography>
+                </CardContent>
+              </Card>
+
+              <Card sx={{ backgroundColor: 'red', color: 'white' }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>คำขอยกเลิกการจอง</Typography>
+                  <Typography variant="h4">{cancelCount} ครั้ง</Typography>
                 </CardContent>
               </Card>
             </Box>

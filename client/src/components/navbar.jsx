@@ -81,6 +81,7 @@ function Navbar1() {
                   <Dropdown.Item as={Link} to="/admin/dashboard">แดชบอร์ด</Dropdown.Item>
                   <Dropdown.Item as={Link} to="/admin/users">จัดการผู้ใช้งาน</Dropdown.Item>
                   <Dropdown.Item as={Link} to="/admin/bookings">จัดการการจองสนาม</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/admin/cancel-request">คำขอยกเลิกการจอง</Dropdown.Item>
                 </>
                 <Dropdown.Item onClick={handleLogout}>ออกจากระบบ</Dropdown.Item>
               </Dropdown.Menu>

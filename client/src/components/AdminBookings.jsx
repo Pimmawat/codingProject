@@ -14,6 +14,11 @@ import {
     Typography,
     TextField,
     Box,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+
 } from "@mui/material";
 import Swal from "sweetalert2";
 import './css/AdminBookings.css';
@@ -29,12 +34,17 @@ const AdminBookings = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [openModal, setOpenModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [slipUrl, setSlipUrl] = useState(null);
+    const [openSlipModal, setOpenSlipModal] = useState(false);
     const navigate = useNavigate();
+
 
     const getUserName = (userId) => {
         const user = users.find((u) => u.id === userId);
         return user ? user.name : "ไม่พบชื่อ";
     };
+
+
 
     useEffect(() => {
         const savedAdmin = JSON.parse(localStorage.getItem('adminData'));
@@ -50,6 +60,7 @@ const AdminBookings = () => {
         }
         axios.get(`${apiUrl}/api/admin/bookings`)
             .then((response) => {
+                console.log(response.data);
                 setBookings(response.data);
             })
             .catch((error) => {
@@ -116,7 +127,7 @@ const AdminBookings = () => {
         setSelectedBooking(booking);
         setOpenModal(true);
     };
-    
+
     const handleUpdateBooking = (updatedBooking) => {
         axios.put(`${apiUrl}/api/admin/bookings/${updatedBooking.booking_id}`, updatedBooking)
             .then((response) => {
@@ -131,7 +142,18 @@ const AdminBookings = () => {
                 console.error("Error updating booking:", error);
             });
     };
+    const viewSlip = async (slipUrl) => {
+        if (slipUrl) {
+            setSlipUrl(slipUrl);  // เก็บ URL ของสลีปที่ต้องการแสดง
+            setOpenSlipModal(true);  // เปิด Modal เพื่อแสดงสลีป
+        } else {
+            Swal.fire("เกิดข้อผิดพลาด!", "ไม่พบ URL สำหรับสลีปนี้", "error");
+        }
+    };
 
+    const handleCloseModal = () => {
+        setOpenModal(false);  // ปิด Modal
+    };
     return (
         <div className="admin-bookings-container-wrapper">
             <div className="admin-bookings-overlay"></div>
@@ -174,6 +196,8 @@ const AdminBookings = () => {
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาสิ้นสุด</TableCell>
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>เวลาที่ใช้ (ชั่วโมง)</TableCell>
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>จองเมื่อ</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: "bold" }}>จองโดย</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: "bold" }}>จำนวน (บาท)</TableCell>
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>จัดการ</TableCell>
                             </TableRow>
                         </TableHead>
@@ -188,6 +212,8 @@ const AdminBookings = () => {
                                     <TableCell align="center">{booking.endTime}</TableCell>
                                     <TableCell align="center">{booking.timeUsed}</TableCell>
                                     <TableCell align="center">{formatDate(booking.created_at)}</TableCell>
+                                    <TableCell align="center">{booking.booking_by ?? "ไม่ระบุ"}</TableCell>
+                                    <TableCell align="center">{booking.amount ?? "ไม่ระบุ"}</TableCell>
                                     <TableCell align="center">
                                         <Button
                                             variant="contained"
@@ -205,6 +231,14 @@ const AdminBookings = () => {
                                         >
                                             ลบ
                                         </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="info"
+                                            sx={{ borderRadius: "20px" }}
+                                            onClick={() => viewSlip(booking.slip_url)}  // ใช้ booking.url
+                                        >
+                                            ดูสลีป
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -220,6 +254,33 @@ const AdminBookings = () => {
                         onUpdate={handleUpdateBooking}
                     />
                 )}
+
+                <Dialog
+                    open={openSlipModal}
+                    onClose={() => setOpenSlipModal(false)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogTitle>สลีปการจอง</DialogTitle>
+                    <DialogContent>
+                        {slipUrl ? (
+                            <img
+                                src={`https://raw.githubusercontent.com/Pimmawat/codingProject/refs/heads/main/server/${slipUrl}`}
+                                alt="Slip"
+                                style={{ width: "100%", height: "auto" }}
+                            />) : (
+                            <div>กำลังโหลดรูปภาพ...</div>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => setOpenSlipModal(false)}
+                            color="primary"
+                        >
+                            ปิด
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Container>
         </div>
     );
