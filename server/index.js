@@ -17,11 +17,26 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+const uploadDir = path.join(__dirname, 'uploads/slip');
 
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const JWT_SECRET = 'hellohackerman';
 
-const upload = multer({ storage: multer.memoryStorage() });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir); // กำหนดให้บันทึกที่โฟลเดอร์ uploads/slip
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // ตั้งชื่อไฟล์เป็น timestamp + นามสกุลเดิม
+  }
+});
+
+const upload = multer({ storage });
 
 const app = express();
 
@@ -175,9 +190,54 @@ app.get('/', (req, res) => {
   res.send("THis is API CpeArena");
 });
 
+app.post('/api/cancel-request', (req, res) => {
+  const { booking_id, reason, promptpay } = req.body;
+  if (!booking_id || !reason || !promptpay) {
+    return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+  console.log(booking_id, reason, promptpay);
+  try {
+    db.query(
+      'INSERT INTO cancel_requests (booking_id, reason, promptpay, status) VALUES (?, ?, ?, ?)',
+      [booking_id, reason, promptpay, 'pending']
+    );
+    res.status(200).json({ message: 'ส่งคำขอยกเลิกสำเร็จ' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
+  }
+});
+
+app.get('/api/cancel-requests', (req, res) => {
+  const sql = 'SELECT * FROM cancel_requests';
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching bookings:', err);
+      res.status(500).send('Error fetching bookings');
+    } else {
+      if (Array.isArray(results)) {
+        res.json(results);
+      } else {
+        res.json([]);
+      }
+    }
+  });
+});
+
+app.put('/api/cancel-requests/:id/approve', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.execute('UPDATE cancel_requests SET status = ? WHERE id = ?', ['approved', id]);
+    res.status(200).json({ message: 'อนุมัติคำขอยกเลิกสำเร็จ' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
+  }
+});
+
 app.post('/api/bookings', (req, res) => {
-  const { id, field, date, startTime, endTime, timeUsed } = req.body;
-  console.log(id, field, date, startTime, endTime, timeUsed);
+  const { id, field, date, startTime, endTime, timeUsed, slip_url, amount } = req.body;
+  console.log(id, field, date, startTime, endTime, timeUsed, slip_url, amount);
 
   const checkQuery = `
     SELECT * FROM reserve WHERE field = ? AND date = ? AND (startTime < ? AND endTime > ?)
@@ -189,10 +249,10 @@ app.post('/api/bookings', (req, res) => {
     }
 
     const query = `
-      INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed) 
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed, booking_by, slip_url, amount) 
+      VALUES (?, ?, ?, ?, ?, ? , ?, ? ,?)
     `;
-    db.query(query, [id, field, date, startTime, endTime, timeUsed], (err, result) => {
+    db.query(query, [id, field, date, startTime, endTime, timeUsed, "Cash", slip_url, amount], (err, result) => {
       if (err) return res.status(500).send(err);
 
       // คำนวณแต้มจากจำนวนชั่วโมง
@@ -240,10 +300,10 @@ app.post('/api/redeem/bookings', (req, res) => {
 
       // เพิ่มข้อมูลการจอง
       const query = `
-        INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO reserve (user_id, field, date, startTime, endTime, timeUsed, booking_by, amount) 
+        VALUES (?, ?, ?, ?, ?, ?, ? , ?)
       `;
-      db.query(query, [id, field, date, startTime, endTime, timeUsed], (err, result) => {
+      db.query(query, [id, field, date, startTime, endTime, timeUsed, "points", "ใช้แต้มแลก"], (err, result) => {
         if (err) return res.status(500).send(err);
         // หักแต้มจากผู้ใช้งาน
         const points = timeUsed * -100;
@@ -426,9 +486,11 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
     const { amount } = req.body;
     const branchId = process.env.BRANCH_ID;
     const apiKey = process.env.API_KEY;
+    const filePath = `/uploads/slip/${req.file.filename}`;
+    const fileStream = fs.createReadStream(req.file.path);
 
     const form = new FormData();
-    form.append('files', req.file.buffer, { filename: req.file.originalname });
+    form.append('files', fileStream, { filename: req.file.filename });
     form.append('amount', amount);
     //form.append('log', 'true');
 
@@ -445,8 +507,7 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
 
     const slipData = response.data.data;
     console.log(slipData);
-
-    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData });
+    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData, filePath });
   } catch (err) {
     console.error(err);
     if (axios.isAxiosError(err) && err.response) {
@@ -755,6 +816,15 @@ app.get('/api/reserves/count', (req, res) => {
   });
 });
 
+app.get('/api/cancel/count', (req, res) => {
+  db.query('SELECT COUNT(*) AS count FROM cancel_requests', (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    res.json({ count: results[0].count });
+  });
+});
+
 app.get('/api/admin/users', (req, res) => {
   const sql = 'SELECT * FROM users';
 
@@ -790,6 +860,19 @@ app.get('/api/admin/bookings', async (req, res) => {
 
   try {
     const [results] = await db.promise().query(sql);
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Error fetching bookings:', err);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูลการจอง' });
+  }
+});
+
+app.get('/api/admin/bookings/:id', async (req, res) => {
+  const { id } = req.params;
+  const sql = 'SELECT * FROM reserve WHERE booking_id = ?';
+
+  try {
+    const [results] = await db.promise().query(sql, [id]);
     res.status(200).json(results);
   } catch (err) {
     console.error('Error fetching bookings:', err);
