@@ -265,7 +265,7 @@ const AdminBookings = () => {
                     <DialogContent>
                         {slipUrl ? (
                             <img
-                                src={`https://raw.githubusercontent.com/Pimmawat/codingProject/refs/heads/main/server/${slipUrl}`}
+                                src={`${slipUrl}`}
                                 alt="Slip"
                                 style={{ width: "100%", height: "auto" }}
                             />) : (

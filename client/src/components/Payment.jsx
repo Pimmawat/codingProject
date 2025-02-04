@@ -128,9 +128,10 @@ const Payment = () => {
                     confirmButtonText: 'ตกลง',
                 }).then(() => {
                     setLoading(false);
-                    console.log(responseData.filePath);
+                    console.log(responseData);
+                    console.log(responseData.imageUrl);
                     console.log(responseData.slipData.amount);
-                    handlePaymentSuccess(responseData.filePath,responseData.slipData.amount);
+                    handlePaymentSuccess(responseData.imageUrl,responseData.slipData.amount);
                     navigate('/ticket');
                 });
             } else {

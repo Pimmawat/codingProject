@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const paymentRoute = require('./payment');
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 const FormData = require('form-data');
 const axios = require("axios");
 const dayjs = require("dayjs");
@@ -17,26 +19,15 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 require('dotenv').config();
-const path = require('path');
-const fs = require('fs');
-const uploadDir = path.join(__dirname, 'uploads/slip');
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 
 const JWT_SECRET = 'hellohackerman';
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir); // กำหนดให้บันทึกที่โฟลเดอร์ uploads/slip
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // ตั้งชื่อไฟล์เป็น timestamp + นามสกุลเดิม
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
 });
-
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
 
@@ -486,11 +477,23 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
     const { amount } = req.body;
     const branchId = process.env.BRANCH_ID;
     const apiKey = process.env.API_KEY;
-    const filePath = `/uploads/slip/${req.file.filename}`;
-    const fileStream = fs.createReadStream(req.file.path);
+
+    const streamUpload = (buffer) => {
+      return new Promise((resolve, reject) => {
+        let stream = cloudinary.uploader.upload_stream({ folder: 'slip_uploads' }, (error, result) => {
+          if (result) resolve(result);
+          else reject(error);
+        });
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
+
+    const cloudinaryResult = await streamUpload(req.file.buffer);
+    const imageUrl = cloudinaryResult.secure_url;
+    console.log("✅ อัปโหลดสลิปสำเร็จ:", imageUrl);
 
     const form = new FormData();
-    form.append('files', fileStream, { filename: req.file.filename });
+    form.append('url', imageUrl);
     form.append('amount', amount);
     //form.append('log', 'true');
 
@@ -506,8 +509,8 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
     );
 
     const slipData = response.data.data;
-    console.log(slipData);
-    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData, filePath });
+    console.log(slipData,imageUrl);
+    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData, imageUrl  });
   } catch (err) {
     console.error(err);
     if (axios.isAxiosError(err) && err.response) {
