@@ -509,8 +509,8 @@ app.post('/api/payment/upload-slip', upload.single('file'), async (req, res) => 
     );
 
     const slipData = response.data.data;
-    console.log(slipData,imageUrl);
-    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData, imageUrl  });
+    console.log(slipData, imageUrl);
+    res.status(200).json({ message: 'อัปโหลดสลิปสำเร็จ', slipData, imageUrl });
   } catch (err) {
     console.error(err);
     if (axios.isAxiosError(err) && err.response) {
@@ -957,6 +957,56 @@ app.put("/api/admin/bookings/:booking_id", (req, res) => {
   }
   )
 });
+
+app.get('/api/reserves/daily', async (req, res) => {
+  try {
+    const query = `
+      SELECT DATE(created_at) AS date, COUNT(*) AS count
+      FROM reserve
+      GROUP BY DATE(created_at)
+      ORDER BY date ASC
+    `;
+
+    // ใช้ .promise() เพื่อให้ query เป็น Promise
+    db.promise().query(query)
+      .then(([rows, fields]) => {
+        res.json(rows); // ส่งผลลัพธ์กลับไป
+      })
+      .catch(error => {
+        console.error("Error fetching daily reserves:", error);
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+      });
+  } catch (error) {
+    console.error("Error fetching daily reserves:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
+app.get('/api/revenue/daily', (req, res) => {
+  // Query สำหรับดึงรายได้รวมจากการจองแต่ละวัน
+  try {
+    const query = `
+    SELECT DATE(created_at) AS date, SUM(amount) AS revenue
+    FROM reserve
+    GROUP BY DATE(created_at)
+    ORDER BY date ASC
+`
+
+    // ใช้ .promise() เพื่อให้ query เป็น Promise
+    db.promise().query(query)
+      .then(([rows, fields]) => {
+        res.json(rows); // ส่งผลลัพธ์กลับไป
+      })
+      .catch(error => {
+        console.error("Error fetching daily reserves:", error);
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+      });
+  } catch (error) {
+    console.error("Error fetching daily reserves:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
 
 //Iot ESP32CAM
 app.post('/api/iot/check-qr', async (req, res) => {
