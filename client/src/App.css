@@ -1,10 +1,22 @@
 /* src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap');
+
+:root {
+  --font-primary: 'Kanit', sans-serif;
+}
+
+body {
+  font-family: var(--font-primary);
+}
+
 .app-container {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     background: #f9f9f9;
+    font-family: var(--font-primary);
+  
   }
   
   .navbar {
@@ -54,4 +66,3 @@
     text-align: center;
     padding: 10px;
   }
-  

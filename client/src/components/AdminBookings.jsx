@@ -217,7 +217,7 @@ const AdminBookings = () => {
                                     <TableCell align="center">
                                         <Button
                                             variant="contained"
-                                            color="primary"
+                                            color="warning"
                                             onClick={() => handleEditBooking(booking)}
                                             sx={{ borderRadius: "20px", marginRight: 2 }}
                                         >

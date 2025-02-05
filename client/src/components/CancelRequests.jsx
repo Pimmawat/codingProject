@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button, Table, TableBody, TableContainer, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Box, Grid, Typography, Paper, CircularProgress } from '@mui/material';
+import {
+    Button, Table, TableBody, TableContainer, TableCell, TableHead, TableRow,
+    Dialog, DialogActions, DialogContent, DialogTitle, Box, Grid, Typography,
+    Paper, CircularProgress
+} from '@mui/material';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
@@ -95,56 +99,60 @@ const CancelRequests = () => {
     };
 
     return (
-        <Box sx={{ padding: 2, marginTop: '150px' }}>
+        <Box sx={{ padding: 3, marginTop: { xs: '100px', md: '120px' } }}>
             <Typography variant="h4" gutterBottom align="center" color="primary">
                 คำขอยกเลิก
             </Typography>
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Booking ID</TableCell>
-                                    <TableCell>เหตุผล</TableCell>
-                                    <TableCell>สถานะ</TableCell>
-                                    <TableCell>การจัดการ</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {requests.length > 0 ? (
-                                    requests.map((request) => (
-                                        <TableRow key={request.id}>
-                                            <TableCell>{request.booking_id}</TableCell>
-                                            <TableCell>{request.reason}</TableCell>
-                                            <TableCell>{request.status}</TableCell>
-                                            <TableCell>
-                                                {request.status === 'pending' && (
-                                                    <Button variant="outlined" color="primary" onClick={() => fetchBookingDetails(request)}>
-                                                        ดูข้อมูล
-                                                    </Button>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
+            <Grid container justifyContent="center">
+                <Grid item xs={12} sm={10} md={8}>
+                    <Paper elevation={3} sx={{ padding: 2, borderRadius: 3 }}>
+                        <TableContainer sx={{ overflowX: "auto" }}>
+                            <Table>
+                                <TableHead>
                                     <TableRow>
-                                        <TableCell colSpan={4} align="center">ไม่มีคำขอยกเลิก</TableCell>
+                                        <TableCell>Booking ID</TableCell>
+                                        <TableCell>เหตุผล</TableCell>
+                                        <TableCell>สถานะ</TableCell>
+                                        <TableCell>การจัดการ</TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                </TableHead>
+                                <TableBody>
+                                    {requests.length > 0 ? (
+                                        requests.map((request) => (
+                                            <TableRow key={request.id}>
+                                                <TableCell>{request.booking_id}</TableCell>
+                                                <TableCell>{request.reason}</TableCell>
+                                                <TableCell>{request.status}</TableCell>
+                                                <TableCell>
+                                                    {request.status === 'pending' && (
+                                                        <Button variant="contained" color="primary" onClick={() => fetchBookingDetails(request)}>
+                                                            ดูข้อมูล
+                                                        </Button>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={4} align="center">ไม่มีคำขอยกเลิก</TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
                 </Grid>
             </Grid>
 
             {/* Modal for Booking Details */}
-            <Dialog open={openModal} onClose={handleCloseModal}>
-                <DialogTitle>รายละเอียดการจอง</DialogTitle>
-                <DialogContent>
+            <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="sm" fullWidth>
+                <DialogTitle align="center">รายละเอียดการจอง</DialogTitle>
+                <DialogContent dividers>
                     {bookingDetails ? (
-                        <TableContainer component={Paper}>
-                            <p>กรุณาโอนเงินคืนก่อนกดอนุมัติ <br />เพราะเมื่อกดอนุมัติแล้วระบบจะทำงานลบข้อมูลการจองยี้ทั้งหมดโดยอัตโนมัติ</p>
+                        <TableContainer >
+                            <Typography align="center" sx={{ mb: 2, color: "red", fontWeight: "bold" }}>
+                                * กรุณาโอนเงินคืนก่อนกดอนุมัติ เนื่องจากข้อมูลจะถูกลบอัตโนมัติ *
+                            </Typography>
                             <Table>
                                 <TableBody>
                                     <TableRow>
@@ -195,16 +203,14 @@ const CancelRequests = () => {
                             </Table>
                         </TableContainer>
                     ) : (
-                        <Typography>กำลังโหลดข้อมูล...</Typography>
+                        <Box display="flex" justifyContent="center" alignItems="center" height={100}>
+                            <CircularProgress />
+                        </Box>
                     )}
                 </DialogContent>
-                <DialogActions>
-                    {bookingDetails && (
-                        <Button variant="contained" color="warning" onClick={() => handleApprove(bookingDetails.booking_id)}>
-                            อนุมัติ
-                        </Button>
-                    )}
-                    <Button onClick={handleCloseModal} color="primary">ปิด</Button>
+                <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+                    <Button variant="contained" color="primary" onClick={() => handleApprove(bookingDetails.booking_id)}>อนุมัติ</Button>
+                    <Button variant="outlined" onClick={() => setOpenModal(false)}>ปิด</Button>
                 </DialogActions>
             </Dialog>
         </Box>
