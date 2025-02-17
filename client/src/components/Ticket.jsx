@@ -115,6 +115,7 @@ const Ticket = () => {
                 <div className="ticket-overlay"></div>
                 <div className="ticket-container">
                     <h2>ข้อมูลการจองของคุณ</h2>
+                    <a href="/booking" className="booking-button">จองสนามเลยยยยย</a>
                     {sortedBookings.length > 0 ? (
                         <table className="booking-table">
                             <thead>

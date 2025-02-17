@@ -51,15 +51,8 @@ const Login = ({ handleLoginSuccess }) => {
         });
         localStorage.setItem('token', data.token);
         handleLoginSuccess(data);
-        Swal.fire({
-          title: 'เข้าสู่ระบบสำเร็จ!',
-          text: data.message,
-          icon: 'success',
-          confirmButtonText: 'ตกลง',
-        }).then(() => {
           setLoading(false); // หยุดหน้า Loading
           navigate('/ticket');
-        });
       } else {
         setLoading(false); // หยุดหน้า Loading
         Swal.fire({
