@@ -50,7 +50,7 @@ const sendOTP = async (email, otp) => {
     service: 'gmail',
     auth: {
       user: 'cpearena@gmail.com',
-      pass: 'ceem yoyn ilrp qsik', // ใช้ App Password
+      pass: 'kpyv ngvm xttm koma', // ใช้ App Password
     },
   });
 
@@ -58,9 +58,105 @@ const sendOTP = async (email, otp) => {
     await transporter.sendMail({
       from: '"CPE Arena" <cpearena@gmail.com>',
       to: email,
-      subject: 'OTP ยืนยันตัวตน',
-      text: `ยินดีต้อนรับเข้าสู่ระบบจองสนาม CPE Arena \n
-      รหัส OTP ของคุณคือ ${otp} จะหมดอายุใน 10 นาที`,
+      subject: '🔐 OTP ยืนยันตัวตนสำหรับเข้าสู่ระบบ',
+      text: `
+    สวัสดี,
+    
+    ยินดีต้อนรับสู่ระบบจองสนาม CPE Arena
+    
+    🔹 รหัส OTP ของคุณคือ: ${otp}
+    🔹 รหัสนี้มีอายุ 10 นาที กรุณาใช้ก่อนหมดอายุ
+    
+    หากคุณไม่ได้ร้องขอรหัสนี้ โปรดเพิกเฉยต่ออีเมลนี้
+    
+    ขอบคุณที่ใช้บริการ
+    CPE Arena`,
+      html: `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9fafb;
+      color: #1f2937;"
+    >
+      <div style="
+        background-color: white;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);"
+      >
+        <img 
+          src="https://res.cloudinary.com/dkvap9luq/image/upload/v1739909584/CPE_h9zel7.png" 
+          alt="CPE Arena Logo" 
+          style="display: block; margin: 0 auto 24px; max-width: 150px;"
+          readonly
+        >
+        
+        <h1 style="
+          color: #111827;
+          font-size: 24px;
+          font-weight: 600;
+          margin-bottom: 16px;
+          text-align: center;"
+        >
+          ยินดีต้อนรับสู่ระบบจองสนาม CPE Arena
+        </h1>
+    
+        <div style="
+          background-color: #f3f4f6;
+          border-radius: 6px;
+          padding: 16px;
+          margin: 24px 0;
+          text-align: center;"
+        >
+          <p style="margin: 0 0 8px; font-size: 16px;">รหัส OTP ของคุณคือ</p>
+          <div style="
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #2563eb;"
+          >
+            ${otp}
+          </div>
+          <p style="
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: #6b7280;"
+          >
+            รหัสนี้มีอายุ 10 นาที กรุณาใช้ก่อนหมดอายุ
+          </p>
+        </div>
+    
+        <p style="
+          color: #6b7280;
+          font-size: 14px;
+          text-align: center;
+          margin: 24px 0;"
+        >
+          หากคุณไม่ได้ร้องขอรหัสนี้ โปรดเพิกเฉยต่ออีเมลนี้
+        </p>
+    
+        <div style="
+          border-top: 1px solid #e5e7eb;
+          margin-top: 24px;
+          padding-top: 24px;
+          text-align: center;
+          color: #6b7280;
+          font-size: 14px;"
+        >
+          <p style="margin: 0;">ขอบคุณที่ใช้บริการ</p>
+          <p style="margin: 4px 0 0; font-weight: 600;">CPE Arena</p>
+        </div>
+      </div>
+    </body>
+    </html>`
     });
     console.log('ส่ง OTP สำเร็จ');
   } catch (error) {
@@ -74,15 +170,132 @@ const sendResetEmail = (email, resetLink) => {
     service: 'gmail',
     auth: {
       user: 'cpearena@gmail.com',
-      pass: 'ceem yoyn ilrp qsik',
+      pass: 'kpyv ngvm xttm koma',
     },
   });
 
   const mailOptions = {
-    from: 'cpearena@gmail.com',
+    from: '"CPE Arena" <cpearena@gmail.com>',
     to: email,
-    subject: 'รีเซ็ตรหัสผ่านของคุณ',
-    html: `<p>กรุณาคลิกที่ลิงก์ด้านล่างเพื่อรีเซ็ตรหัสผ่านของคุณ:</p><p><a href="${resetLink}">${resetLink}</a></p>`,
+    subject: '🔑 รีเซ็ตรหัสผ่านของคุณ',
+    text: `
+  สวัสดี,
+  
+  คุณได้ร้องขอการรีเซ็ตรหัสผ่านสำหรับบัญชี CPE Arena ของคุณ
+  กรุณาคลิกที่ลิงก์ด้านล่างเพื่อตั้งรหัสผ่านใหม่:
+  
+  ${resetLink}
+  
+  หากคุณไม่ได้ร้องขอการรีเซ็ตรหัสผ่าน โปรดเพิกเฉยต่ออีเมลนี้
+  
+  ขอบคุณที่ใช้บริการ
+  CPE Arena`,
+    html: `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body style="
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9fafb;
+    color: #1f2937;"
+  >
+    <div style="
+      background-color: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);"
+    >
+      <img 
+        src="https://res.cloudinary.com/dkvap9luq/image/upload/v1739909584/CPE_h9zel7.png" 
+        alt="CPE Arena Logo" 
+        style="display: block; margin: 0 auto 24px; max-width: 150px;"
+        readonly
+      >
+      
+      <h1 style="
+        color: #111827;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        text-align: center;"
+      >
+        รีเซ็ตรหัสผ่านของคุณ
+      </h1>
+  
+      <p style="
+        color: #4b5563;
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 24px;
+        text-align: center;"
+      >
+        คุณได้ร้องขอการรีเซ็ตรหัสผ่านสำหรับบัญชี CPE Arena ของคุณ<br>
+        กรุณาคลิกที่ปุ่มด้านล่างเพื่อตั้งรหัสผ่านใหม่
+      </p>
+  
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${resetLink}" 
+          style="
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.2s;"
+        >
+          รีเซ็ตรหัสผ่าน
+        </a>
+      </div>
+  
+      <p style="
+        color: #6b7280;
+        font-size: 14px;
+        margin: 24px 0;
+        text-align: center;"
+      >
+        หากปุ่มด้านบนไม่ทำงาน คุณสามารถคัดลอกและวางลิงก์ด้านล่างในเบราว์เซอร์ของคุณ:<br>
+        <a href="${resetLink}" 
+          style="
+            color: #2563eb;
+            word-break: break-all;
+            font-size: 12px;"
+        >
+          ${resetLink}
+        </a>
+      </p>
+  
+      <p style="
+        color: #6b7280;
+        font-size: 14px;
+        text-align: center;
+        margin: 24px 0;"
+      >
+        หากคุณไม่ได้ร้องขอการรีเซ็ตรหัสผ่าน โปรดเพิกเฉยต่ออีเมลนี้
+      </p>
+  
+      <div style="
+        border-top: 1px solid #e5e7eb;
+        margin-top: 24px;
+        padding-top: 24px;
+        text-align: center;
+        color: #6b7280;
+        font-size: 14px;"
+      >
+        <p style="margin: 0;">ขอบคุณที่ใช้บริการ</p>
+        <p style="margin: 4px 0 0; font-weight: 600;">CPE Arena</p>
+      </div>
+    </div>
+  </body>
+  </html>`
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -98,7 +311,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'cpearena@gmail.com',
-    pass: 'ceem yoyn ilrp qsik',
+    pass: 'kpyv ngvm xttm koma',
   },
 });
 
