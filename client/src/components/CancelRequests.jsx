@@ -92,12 +92,6 @@ const CancelRequests = () => {
         });
     };
 
-    const handleCloseModal = () => {
-        setOpenModal(false);
-        setBookingDetails(null);
-        setSelectedRequest(null);
-    };
-
     return (
         <Box sx={{ padding: 3, marginTop: { xs: '100px', md: '120px' } }}>
             <Typography variant="h4" gutterBottom align="center" color="primary">

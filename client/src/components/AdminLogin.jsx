@@ -38,15 +38,8 @@ const AdminLogin = () => {
       if (response.ok) {
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminData', JSON.stringify(data.admin));
-        Swal.fire({
-          title: 'เข้าสู่ระบบสำเร็จ!',
-          text: data.message,
-          icon: 'success',
-          confirmButtonText: 'ตกลง',
-        }).then(() => {
-          setLoading(false); // หยุดหน้า Loading
-          navigate('/admin/dashboard');
-        });
+        setLoading(false); // หยุดหน้า Loading
+        navigate('/admin/dashboard');
       } else {
         setLoading(false); // หยุดหน้า Loading
         Swal.fire({
