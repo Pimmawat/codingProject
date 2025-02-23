@@ -128,10 +128,10 @@ const Booking = () => {
     };
 
     return (
-        <div className="booking-container-wrapper">
-            <div className="booking-overlay"></div>
-            <form onSubmit={handleSubmit} className="booking-form">
-                <div className="form-group">
+        <div className="booking-container-wrapper" >
+            <div className="booking-overlay" ></div>
+            <form onSubmit={handleSubmit} className="booking-form" style={{ margin: "50px 20px" }}>
+                <div className="form-group" >
                     <label htmlFor="field">เลือกสนาม:</label>
                     <select
                         id="field"

@@ -99,7 +99,7 @@ const Profile = () => {
     return (
         <div className="profile-container-wrapper">
             <div className="profile-overlay"></div>
-            <div className="profile-container">
+            <div className="profile-container" style={{ margin: "50px 20px" }}>
                 <h1>แก้ไขโปรไฟล์</h1>
                 {loading ? (
                     <p>Loading...</p>
