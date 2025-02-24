@@ -2,6 +2,7 @@
 .navbar {
   background-color: #ffffff;
   border-bottom: 1px solid #ffffff;
+  
 }
 
 .navbar-brand {
@@ -44,3 +45,13 @@
   background-color: #28a745;
   color: white;
 }
+
+.dropdown-item.logout {
+  color: #ff2828 !important;
+  background-color: #ffffff !important; /* สีแดง */
+}
+
+.dropdown-item.logout:hover {
+  background-color: #ebebeb !important; /* สีแดงเข้มตอน hover */
+}
+

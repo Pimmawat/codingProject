@@ -26,7 +26,6 @@ const Ticket = () => {
             try {
                 const response = await fetch(`${apiUrl}/api/tickets?user_id=${user.id}`); // ใช้ user_id แทน phone
                 const data = await response.json();
-                console.log(data);
                 setBookings(data);
             } catch (error) {
                 console.error('Error fetching bookings:', error);

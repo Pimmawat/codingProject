@@ -23,7 +23,6 @@ const Booking = () => {
                 const response = await fetch(`${apiUrl}/api/bookings`);
                 const data = await response.json();
                 setBookedTimes(data);  // เก็บข้อมูลการจองใน state
-                console.log(data);
             } catch (error) {
                 console.error('Error fetching bookings:', error);
             }
