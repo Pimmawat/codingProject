@@ -33,7 +33,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
 
 app.use(cors({
-  origin: '*',
+  origin: 'https://cpearena.vercel.app',
   methods: ['*'],
   credentials: true,
 }));
