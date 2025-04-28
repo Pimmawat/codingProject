@@ -39,6 +39,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(express.json());
+app.options('*', cors());
 
 db.connect((err) => {
   if (err) throw err;
