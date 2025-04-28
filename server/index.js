@@ -34,7 +34,7 @@ const app = express();
 
 app.use(cors({
   origin: 'https://cpearena.vercel.app',
-  methods: ['*'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 }));
 app.use(bodyParser.json());
